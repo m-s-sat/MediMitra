@@ -113,7 +113,7 @@ server.set('trust proxy', 1);
 passport.use("google", new googleStrategy({
     clientID: process.env.GOOGLE_CLIENTID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'https://medimitra.ms-sat.xyz/auth/google/callback',
+    callbackURL: process.env.CALLBACKURL,
     userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
 }, async (accessToken, refreshToken, profile, done) => {
     try {

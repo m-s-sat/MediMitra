@@ -1,4 +1,4 @@
-
+require('dotenv').config();
 const express = require('express');
 const passport = require('passport');
 const {
@@ -24,7 +24,7 @@ router
     .get('/check', isAuth, checkAuthStatus)
     .get('/google', passport.authenticate('google', { scope: ["profile", "email"] }))
     .get('/google/callback', passport.authenticate("google"), (req, res) => {
-        res.redirect('https://medimitra.ms-sat.xyz/dashboard');
+        res.redirect(process.env.REDIRECT_DASHBOARD);
     })
     .post('/reset-request', setForgotPassToken)
     .post('/password-reset', forgotpass)

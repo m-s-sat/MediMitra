@@ -9,6 +9,7 @@ const path = require('path');
 const HospitalReg = require('../model/hospitalreg');
 const cron = require('node-cron');
 
+
 const emailTemplate = fs.readFileSync(path.join(__dirname,'../template/emailTemplate.html'), 'utf-8');
 const welcomeEmailTemplate = fs.readFileSync(
     path.join(__dirname, '../template/welcomeemail.html'), 
@@ -24,7 +25,7 @@ exports.createUser = async(req, res)=>{
             const user = new User({username, name, password:hashedPassword, phone, preferredLanguage, avatar, dob, pincode, role});
             await user.save();
             const appName = 'Medimitra';
-            const profileLink = 'https://medimitra.ms-sat.xyz/profile';
+            const profileLink = process.env.PROFILELINK;
             const currentYear = new Date().getFullYear();
             let htmlToSend = welcomeEmailTemplate
                 .replace(/{{APP_NAME}}/g, appName)
@@ -109,7 +110,7 @@ exports.setForgotPassToken = async(req,res)=>{
         const token = crypto.randomBytes(32).toString('hex');
         user.resetPasswordToken = token;
         await user.save();
-        const resetPageLink = 'https://medimitra.ms-sat.xyz/password-reset/?token='+token+'&email='+email;
+        const resetPageLink = 'http://locahost:5173/password-reset/?token='+token+'&email='+email;
         const subject = 'Reset password for your medimitra account';
         let html = emailTemplate.replace('{{RESET_LINK}}', resetPageLink);
         html = html.replace('{{NAME}}', user.name);
