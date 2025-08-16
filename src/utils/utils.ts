@@ -36,7 +36,7 @@ export const calculateCompletionPercentage = (user: User | null, profileData: Pr
   if (profileData?.emergencyContact?.name) completed++;
   if (profileData.bodyMeasurements?.height) completed++;
   if (profileData.bodyMeasurements?.weight) completed++;
-  if (profileData.medicalHistory?.allergies.length > 0) completed++;
+  if (profileData.medicalHistory?.allergies?.length > 0) completed++;
 
   return Math.round((completed / total) * 100);
 };
