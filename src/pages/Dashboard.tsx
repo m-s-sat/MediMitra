@@ -26,26 +26,26 @@ export const Dashboard: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const mockProfileData = {
-    name: user?.name || 'John Doe',
-    age: user?.age || '30',
-    gender: user?.gender || 'male',
-    phone: user?.phone || '1234567890',
-    email: user?.email || 'john.doe@example.com',
+    name: user?.name || null,
+    age: user?.age || null,
+    gender: user?.gender || null,
+    phone: user?.phone || null,
+    email: user?.email || null,
     emergencyContact: {
-      name: user?.emergencyContact?.name || 'Jane Doe',
-      phone: user?.emergencyContact?.phone || '0987654321',
-      relationship: user?.emergencyContact?.relationship || 'Spouse'
+      name: user?.emergencyContact?.name || null,
+      phone: user?.emergencyContact?.phone || null,
+      relationship: user?.emergencyContact?.relationship || null
     },
     medicalHistory: {
-      pastIllnesses: user?.medicalHistory?.pastIllnesses || ['Flu (2023)'],
-      ongoingConditions: user?.medicalHistory?.ongoingConditions || ['Hypertension'],
-      allergies: user?.medicalHistory?.allergies || ['Peanuts'],
-      currentMedications: user?.medicalHistory?.currentMedications || ['Lisinopril 10mg']
+      pastIllnesses: user?.medicalHistory?.pastIllnesses || null,
+      ongoingConditions: user?.medicalHistory?.ongoingConditions || null,
+      allergies: user?.medicalHistory?.allergies || null,
+      currentMedications: user?.medicalHistory?.currentMedications || null
     },
     bodyMeasurements: {
-      height: user?.bodyMeasurements?.height || '175',
-      weight: user?.bodyMeasurements?.weight || '70',
-      bmi: user?.bodyMeasurements?.bmi || '22.9'
+      height: user?.bodyMeasurements?.height || null,
+      weight: user?.bodyMeasurements?.weight || null,
+      bmi: user?.bodyMeasurements?.bmi || null
     }
   };
 

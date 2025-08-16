@@ -2,27 +2,27 @@
 import { User } from '../types';
 
 interface ProfileData {
-  name: string;
-  age: string;
-  gender: string;
-  phone: string;
-  email: string;
+  name: string | null;
+  age: string | null;
+  gender: string | null;
+  phone: string | null;
+  email: string | null;
   emergencyContact: {
     name: string;
     phone: string;
     relationship: string;
-  };
+  } | null;
   medicalHistory: {
     pastIllnesses: string[];
     ongoingConditions: string[];
     allergies: string[];
     currentMedications: string[];
-  };
+  } | null;
   bodyMeasurements: {
     height: string;
     weight: string;
     bmi: string;
-  };
+  } | null;
 }
 
 export const calculateCompletionPercentage = (user: User | null, profileData: ProfileData): number => {
@@ -33,10 +33,10 @@ export const calculateCompletionPercentage = (user: User | null, profileData: Pr
   if (profileData.age) completed++;
   if (profileData.gender) completed++;
   if (user?.phone || profileData.phone) completed++;
-  if (profileData.emergencyContact.name) completed++;
-  if (profileData.bodyMeasurements.height) completed++;
-  if (profileData.bodyMeasurements.weight) completed++;
-  if (profileData.medicalHistory.allergies.length > 0) completed++;
+  if (profileData?.emergencyContact?.name) completed++;
+  if (profileData.bodyMeasurements?.height) completed++;
+  if (profileData.bodyMeasurements?.weight) completed++;
+  if (profileData.medicalHistory?.allergies.length > 0) completed++;
 
   return Math.round((completed / total) * 100);
 };
