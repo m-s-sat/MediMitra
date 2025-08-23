@@ -83,45 +83,104 @@ MediMitra bridges the gap between patients, doctors, and hospital administrators
 
 ```plaintext
 MediMitra/
-├── .gitignore
-├── agent_api/
+├── .vscode/
+│   └── settings.json
+├── agent/
 │   ├── __pycache__/
+│   │   ├── api.cpython-313.pyc
+│   │   ├── booking.cpython-313.pyc
+│   │   ├── bot.cpython-313.pyc
+│   │   └── gemini_embedding.cpython-313.pyc
+│   ├── .env.example
+│   ├── .gitignore
 │   ├── api.py
+│   ├── booking.py
 │   ├── bot.py
-│   ├── neo4j_tool.py
+│   ├── Dockerfile
+│   ├── embedding_model.py
+│   ├── gemini_embedding.py
 │   └── requirements.txt
 ├── Backend/
+│   ├── .env.example
 │   ├── .gitignore
 │   ├── common/
+│   │   └── common.js
 │   ├── control/
+│   │   ├── auth.js
+│   │   ├── cronjob.js
+│   │   └── hopitals.js
+│   ├── Dockerfile
 │   ├── index.js
 │   ├── model/
+│   │   ├── auth.js
+│   │   ├── hospitalreg.js
+│   │   ├── hospitals.js
+│   │   └── userweaklytracker.js
 │   ├── package.json
 │   ├── routes/
+│   │   ├── auth.js
+│   │   └── hospital.js
 │   └── template/
-├── eslint.config.js
-├── index.html
-├── package-lock.json
-├── package.json
-├── postcss.config.js
-├── README.md
-├── src/
-│   ├── App.tsx
-│   ├── assets/
-│   ├── components/
-│   ├── context/
-│   ├── index.css
-│   ├── main.tsx
-│   ├── pages/
-│   ├── translations/
-│   ├── types/
-│   ├── utils/
-│   └── vite-env.d.ts
-├── tailwind.config.js
-├── tsconfig.app.json
-├── tsconfig.json
-├── tsconfig.node.json
-└── vite.config.ts
+│       ├── emailTemplate.html
+│       ├── logo.jpg
+│       └── welcomeemail.html
+├── client/
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── src/
+│   │   ├── App.tsx
+│   │   ├── assets/
+│   │   │   └── Logo.png
+│   │   ├── components/
+│   │   │   ├── BedManagementComponent.tsx
+│   │   │   ├── FeatureCard.tsx
+│   │   │   ├── Header.tsx
+│   │   │   ├── LanguageSelector.tsx
+│   │   │   ├── QuickActionCard.tsx
+│   │   │   ├── Timeago.tsx
+│   │   │   └── TypingDotsLoader.tsx
+│   │   ├── context/
+│   │   │   ├── AuthContext.tsx
+│   │   │   └── LanguageContext.tsx
+│   │   ├── index.css
+│   │   ├── main.tsx
+│   │   ├── pages/
+│   │   │   ├── AppointmentsPage.tsx
+│   │   │   ├── ChatPage.tsx
+│   │   │   ├── DashBack
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── EmergencyPage.tsx
+│   │   │   ├── HelpdeskPage.tsx
+│   │   │   ├── HospitalDashboard.tsx
+│   │   │   ├── HospitalProfile.tsx
+│   │   │   ├── HospitalSignUpPage.tsx
+│   │   │   ├── LandingPage.tsx
+│   │   │   ├── LoginPage.tsx
+│   │   │   ├── MyMedicinesPage.tsx
+│   │   │   ├── PasswordResetPage.tsx
+│   │   │   ├── ProfilePage.tsx
+│   │   │   └── SignupPage.tsx
+│   │   ├── translations/
+│   │   │   └── translations.json
+│   │   ├── types/
+│   │   │   ├── hospital.ts
+│   │   │   └── index.ts
+│   │   ├── utils/
+│   │   │   └── utils.ts
+│   │   └── vite-env.d.ts
+│   ├── tailwind.config.js
+│   ├── tsconfig.app.json
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   └── vite.config.ts
+├── docker-compose.yml
+├── LICENSE
+└── README.md
+
 ```
 
 ---
