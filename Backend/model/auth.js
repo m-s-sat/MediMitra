@@ -1,6 +1,18 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+const medicineSchema = new Schema({
+  name: {type: String, required: true},
+  dosage: {type: String, required: true},
+  frequency: {type: String, required: true},
+  times: {type: [String]},
+  taken: {type: Boolean, default: false},
+  prescribedBy: {type: String, required: true},
+  startDate: {type: String, required: true},
+  endDate: {type: String, required: true},
+  sideEffects: {type: String}
+})
+
 const userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   name: { type: String, required: true },
@@ -36,7 +48,8 @@ const userSchema = new Schema({
     },
     lastUpdated: { type: Date, default: Date.now() },
     weeklyReminderSent: { type: Boolean, default: false }
-  }
+  },
+  medicines: [medicineSchema]
 }, { timestamps: true });
 
 userSchema.set('toJSON', {

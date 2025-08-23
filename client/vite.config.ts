@@ -30,9 +30,9 @@ export default defineConfig({
         secure: false
       },
       '/api': {
-        target: 'http://172.31.93.85:8000',
+        target: 'http://localhost:5001',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        secure: false,
       }
     }
   }

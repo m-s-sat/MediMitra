@@ -5,7 +5,6 @@ export interface User {
   phone?: string;
   preferredLanguage: string;
   avatar?: string;
-  password?: string;
   dob?: string,
   pincode?: number,
   emergencyContact?: {
@@ -46,7 +45,8 @@ export interface User {
       painScore?: string;
     }
     lastUpdated?: Date;
-  }
+  },
+  medicine?: Medicine[]
 }
 export interface ProfileData {
   name: string;
@@ -98,7 +98,6 @@ export interface Report {
 }
 
 export interface Medicine {
-  id: string;
   name: string;
   dosage: string;
   frequency: string;
@@ -107,6 +106,7 @@ export interface Medicine {
   prescribedBy: string;
   startDate: string;
   endDate: string;
+  sideEffects: string;
 }
 
 export interface ChatMessage {

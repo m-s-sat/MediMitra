@@ -172,7 +172,7 @@ server.post('/api/chat_message', isAuth, (req, res) => {
   const postData = JSON.stringify(req.body);
 
   const options = {
-    hostname: 'agent',
+    hostname: '127.0.0.1',
     port: 8000,
     path: '/chat_message',
     method: 'POST',
