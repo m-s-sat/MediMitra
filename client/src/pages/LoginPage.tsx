@@ -100,7 +100,7 @@ export const LoginPage: React.FC = () => {
   <div className="text-center">
     <div className="flex justify-center mb-6 mt-6">
       <div className="w-16 h-16 rounded-xl flex items-center justify-center">
-        <img src={logo} alt="Aarogya Mitra" className="max-h-full max-w-full object-contain" />
+        <img src={logo} alt="MediMitra" className="max-h-full max-w-full object-contain" />
       </div>
     </div>
     <h2 className="text-3xl font-bold text-gray-900 mb-2">

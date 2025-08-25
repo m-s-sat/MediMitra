@@ -237,7 +237,7 @@ export const LandingPage: React.FC = () => {
             ))}
           </div>
           <blockquote className="text-2xl font-medium text-gray-900 mb-6 max-w-4xl mx-auto">
-            {t('testimonial.text') || `"Aarogya Mitra made it so easy to book appointments and communicate with doctors in my native language. The AI assistant is incredibly helpful and understanding."`}
+            {t('testimonial.text') || `"MediMitra made it so easy to book appointments and communicate with doctors in my native language. The AI assistant is incredibly helpful and understanding."`}
           </blockquote>
           <div className="text-gray-600">
             <p className="font-semibold">{t('testimonial.name') || 'Maria Rodriguez'}</p>
@@ -252,7 +252,7 @@ export const LandingPage: React.FC = () => {
           {t('cta.title') || 'Ready to Take Control of Your Health?'}
         </h2>
         <p className="text-xl mb-8 max-w-3xl mx-auto text-blue-100">
-          {t('cta.subtitle') || 'Join thousands of users who trust Aarogya Mitra for their healthcare needs'}
+          {t('cta.subtitle') || 'Join thousands of users who trust MediMitra for their healthcare needs'}
         </p>
         <Link
           to="/signup"
@@ -273,12 +273,12 @@ export const LandingPage: React.FC = () => {
                   <div className="w-20 h-20 rounded-lg flex items-center justify-center">
               <img
                 src={logo}
-                alt="Aarogya Mitra"
+                alt="MediMitra"
                 className="max-h-full max-w-full object-contain"
               />
             </div>
                 </div>
-                <span className="text-xl font-bold">{t('footer.brand') || 'Aarogya Mitra'}</span>
+                <span className="text-xl font-bold">{t('footer.brand') || 'MediMitra'}</span>
               </div>
               <p className="text-gray-400">
                 {t('footer.tagline') || 'Your trusted multilingual healthcare companion'}
@@ -310,7 +310,7 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 {t('footer.brand') || 'Aarogya Mitra'}. {t('footer.rights') || 'All rights reserved.'}</p>
+            <p>&copy; 2025 {t('footer.brand') || 'MediMitra'}. {t('footer.rights') || 'All rights reserved.'}</p>
           </div>
         </div>
       </footer>
