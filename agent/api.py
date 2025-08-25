@@ -44,7 +44,8 @@ Assistant: Calls a tool to book appointment of the doctor.
 If you want to know about some type of disease or symptom related data use the disease info tool and also web search
 
 """
-dynamic_sys= f"{get_current_datetime_response()}, Location of the user= lat=16.27939453125&lon=80.58837890625 \n"
+dynamic_sys= f"""{get_current_datetime_response()},
+Location of the user=> lat=16.27939453125 & lon=80.58837890625 \n"""
 
 
 def stream_chat(message,id):
@@ -52,7 +53,9 @@ def stream_chat(message,id):
     id_ = id
     
     global static_sys
-    global dynamic_sys
+    dynamic_sys= f"""{get_current_datetime_response()},
+    Location of the user=> lat=16.27939453125 & lon=80.58837890625 \n"""
+
     dynamic = dynamic_sys + " User id: " + id_
     state = chat(static_system=static_sys,
                  dynamic_system=dynamic,

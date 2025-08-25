@@ -167,7 +167,7 @@ class chat(BaseModel):
     @computed_field(return_type=BaseMessage)
     @property
     def model_in_summary(self):
-        prompt = PromptTemplate.from_template("""Long term memory with the user:\n
+        prompt = PromptTemplate.from_template("""Long term memory with the user:
                                               {summary} """)
         return SystemMessage(prompt.format(summary=self.summary))
 
@@ -219,21 +219,24 @@ def token_count(chats: chat):
         return "chat"
 
 def history(chats: chat):
-    message = chats.messages[0]
-    summary = SystemMessage(chats.summary)
+    message = chats.messages[0:3] if len(chats.messages) > 3 else chats.messages[0:1]
+    model_in = message.copy()
+    summary = chats.model_in_summary
+    model_in.append(summary)
+    remove = []
+    prompt = """You are a perfect summarizer. You have to summarize an ongoing conversation between 
+    an ai and a user so that if the ai sees the summary he should have a long term knowledge of what
+    was going on. keep only those things that are important for long term memory of the agent.
+    Summarize the above messages. Summary must to be to the point and should be under 200 words"""
+    command = SystemMessage(prompt)
+    model_in.append(command)
     
-    prompt = f"""Summarize the given messages. Summary must to be to the point and should be under 200 words
-    last user message: {message.content}
-    summary of a conversation: {chats.summary}
-    """
+    result = summary_llm.invoke(model_in)
+    for m in message:
+        id_r = m.id
+        remove.append(RemoveMessage(id=str(id_r)))
     
-    # model_in = [command]+[summary]+[message]
-    model_in = prompt
-    result = summary_llm.invoke(model_in).content
-    id_r = message.id
-    remove = RemoveMessage(id=str(id_r))
-    
-    return {"summary":"","messages":[remove]}
+    return {"summary":result.content,"messages":remove}
 
 # %%
 builder = StateGraph(chat)
@@ -267,7 +270,33 @@ graph = builder.compile(checkpointer=checkpointer)
 # %%
 # graph
 
-# %%
+# # %%
+# from langchain_core.messages import HumanMessage
+# dynamic_sys= f"""{get_current_datetime_response()},
+#     Location of the user=> lat=16.27939453125 & lon=80.58837890625 \n"""
+# static_sys = """You are a healthcare assistant deployed on a website named "MediMitra".
+# Your role is:
+# 1. Assist the users with there health related issues, for this you can also access a database to get some information
+#    on diseases to help the user properly.
+# 2. Talk to the user like a professional but in a soft and cheering tone since the user is ill and he needs support.
+# 3. If the user wants you have to book the user's appointment with the doctor.
+# 4. "You must call only one tool at a time"
+
+# While booking user's appointment with a doctor follow this type of thinking:
+# User input: Tell me about the doctors available in my area.
+# Assistant: Calls a tool like api_retriver to get the Hospitals.
+# Tool: Hospitals list near the user.
+# Assistant: Calls a tool to get the doctors from the hospitals.
+# Tools: Gives the doctors available
+# Assistant: Tell the user about the doctors and there time slots and asks the user for which doctor to book and confirm
+# about booking.
+# User: Says to book some of the doctors
+# Assistant: Calls a tool to book appointment of the doctor.
+
+# If you want to know about some type of disease or symptom related data use the disease info tool and also web search
+
+# """
+# # %%
 # user = input("You: ")
 # while user.lower() not in ["q", "quit", "exit"]:
 #     llm_input = HumanMessage(content=user)
@@ -278,7 +307,7 @@ graph = builder.compile(checkpointer=checkpointer)
 #                  )
 #     print("AI: ")
 #     for chunk, meta in graph.stream(input=state,
-#                                 config={"configurable": {"thread_id": "final_test"}},
+#                                 config={"configurable": {"thread_id": "6895e18fde8c65ee059b79ed"}},
 #                                 stream_mode="messages"
 #                                 ):
 #         if chunk.content and meta["langgraph_node"] == "chat_node":
@@ -295,3 +324,5 @@ graph = builder.compile(checkpointer=checkpointer)
 # # %%
 # check["channel_values"]["messages"]
 # # %%
+
+# %%
