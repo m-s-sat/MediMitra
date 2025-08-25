@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -20,8 +20,18 @@ import { useAuth } from '../context/AuthContext.tsx';
 import { useLanguage } from '../context/LanguageContext';
 import { QuickActionCard } from '../components/QuickActionCard';
 import { calculateCompletionPercentage } from '../utils/utils';
+import { useGeolocation } from '../custom_hooks/locationHook.tsx';
 
 export const Dashboard: React.FC = () => {
+  const { loaded, coords, error } = useGeolocation({
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0,
+  });
+  useEffect(()=>{
+    if (loaded) console.log(coords.lat, coords.lng); 
+    if (error) console.log(error)
+  },[coords.lat, coords.lng, error, loaded])
   const { user } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
