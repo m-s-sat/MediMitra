@@ -32,7 +32,7 @@ export const LoginPage: React.FC = () => {
       return;
     }
     setIsSendLoading(true)
-    const response = await fetch('/auth/reset-request',{
+    const response = await fetch('/api/auth/reset-request',{
       method: "POST",
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ email: email }),

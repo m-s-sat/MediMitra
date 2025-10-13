@@ -141,7 +141,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const updateUser = async (newUserData: Partial<User>) => {
     if (user) {
-      const response = await fetch('/auth/profileupdate',{
+      const response = await fetch('/api/auth/profileupdate',{
         credentials: 'include',
         method: 'PATCH',
         headers: {'content-type':'application/json'},
@@ -158,7 +158,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const getStates = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/hospital/states', { method: 'GET', credentials: 'include' });
+      const response = await fetch('/api/hospital/states', { method: 'GET', credentials: 'include' });
       if (!response.ok) throw new Error("Failed to fetch states");
       const data = await response.json();
       setStates(data);
@@ -175,7 +175,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     setDistricts([]);
     try {
-      const response = await fetch('/hospital/districts', {
+      const response = await fetch('/api/hospital/districts', {
         method: 'POST',
         credentials: 'include',
         headers: { 'content-type': 'application/json' },
@@ -197,7 +197,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     setHospitals([]);
     try {
-      const response = await fetch('/hospital/hospitals', {
+      const response = await fetch('/api/hospital/hospitals', {
         method: 'POST',
         credentials: 'include',
         headers: { 'content-type': 'application/json' },
@@ -222,7 +222,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
   const addDoctor = async (update:Doctor) =>{
-    const response = await fetch('/auth/update/doctor', {
+    const response = await fetch('/api/auth/update/doctor', {
       method: 'PATCH',
       credentials: 'include',
       headers: { 'content-type': 'application/json' },

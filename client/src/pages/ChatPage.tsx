@@ -23,7 +23,7 @@ const generateStreamingResponse = async (
   onEnd: () => void
 ) => {
   try {
-    const response = await fetch(`/api/chat_message`, {
+    const response = await fetch(`/agent/chat_message`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
