@@ -54,7 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkUserStatus = async () => {
       try {
-        const response = await fetch("auth/check", {
+        const response = await fetch("/auth/check", {
           credentials: "include",
         });
         if (response.ok) {

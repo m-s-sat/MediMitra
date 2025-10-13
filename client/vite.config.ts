@@ -10,27 +10,27 @@ export default defineConfig({
   server:{
     proxy:{
       '/auth':{
-        target: 'http://localhost:5001',
+        target: 'http://backend:5001',
         changeOrigin: true,
         secure: false,
       },
       '/auth/*':{
-        target: 'http://localhost:5001',
+        target: 'http://backend:5001',
         changeOrigin: true,
         secure: false
       },
       '/hospital': {
-        target: 'http://localhost:5001',
+        target: 'http://backend:5001',
         changeOrigin: true,
         secure: false,
       },
       '/hospital/*': {
-        target: 'http://localhost:5001',
+        target: 'http://backend:5001',
         changeOrigin: true,
         secure: false
       },
       '/api': {
-        target: 'http://localhost:5001',
+        target: 'http://agent:8000',
         changeOrigin: true,
         secure: false,
       }
