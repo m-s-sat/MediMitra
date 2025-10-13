@@ -1,14 +1,21 @@
 version: "3.9"
 
 services:
+  frontend:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - agent
   backend:
     build:
       context: .
       dockerfile: backend/Dockerfile
     ports:
       - "5000:5001"
-    depends_on:
-      - agent
     env_file:
       - Backend/.env
 
