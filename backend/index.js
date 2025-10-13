@@ -165,8 +165,8 @@ async function main() {
 main().catch(err => console.log(err));
 
 
-server.use('/auth', authRouter.router);
-server.use('/hospital', hospitalRouter);
+server.use('/api/auth', authRouter.router);
+server.use('/api/hospital', hospitalRouter);
 
 server.post('/api/chat_message', isAuth, (req, res) => {
   const postData = JSON.stringify(req.body);

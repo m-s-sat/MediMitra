@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   frontend:
+    container_name: medimitra/frontend
     build:
       context: .
       dockerfile: ./client/Dockerfile
@@ -11,6 +12,7 @@ services:
       - backend
       - agent
   backend:
+    container_name: medimitra/backend
     build:
       context: .
       dockerfile: ./backend/Dockerfile
@@ -20,7 +22,7 @@ services:
       - backend/.env
 
   agent:
-    container_name: agent
+    container_name: medimitra/agent
     build:
       context: .
       dockerfile: ./agent/Dockerfile

@@ -9,27 +9,12 @@ export default defineConfig({
   },
   server:{
     proxy:{
-      '/auth':{
+      '/api':{
         target: 'http://backend',
         changeOrigin: true,
         secure: false,
       },
-      '/auth/*':{
-        target: 'http://backend',
-        changeOrigin: true,
-        secure: false
-      },
-      '/hospital': {
-        target: 'http://backend',
-        changeOrigin: true,
-        secure: false,
-      },
-      '/hospital/*': {
-        target: 'http://backend',
-        changeOrigin: true,
-        secure: false
-      },
-      '/api': {
+      '/agent': {
         target: 'http://agent',
         changeOrigin: true,
         secure: false,

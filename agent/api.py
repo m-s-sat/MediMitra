@@ -72,7 +72,7 @@ class request_(BaseModel):
     message: str
     id: str
     
-@app.post("/chat_message")
+@app.post("/agent/chat_message")
 def stream(request: request_):
     message = request.message
     id = request.id
