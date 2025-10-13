@@ -1,6 +1,6 @@
 FROM node:current-alpine3.22 AS frnotend
 WORKDIR /app
-COPY . .
+COPY ./client .
 RUN npm install && npm run build
 
 FROM nginx:alpine
