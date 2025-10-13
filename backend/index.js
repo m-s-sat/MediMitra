@@ -167,6 +167,9 @@ main().catch(err => console.log(err));
 
 server.use('/api/auth', authRouter.router);
 server.use('/api/hospital', hospitalRouter);
+server.get('/api/status', (req,res)=>{
+    res.send({status: 'ok'});
+})
 
 server.post('/api/chat_message', isAuth, (req, res) => {
   const postData = JSON.stringify(req.body);
