@@ -54,7 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkUserStatus = async () => {
       try {
-        const response = await fetch("/auth/check", {
+        const response = await fetch("/api/auth/check", {
           credentials: "include",
         });
         if (response.ok) {
@@ -76,7 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkUserStatus();
   }, []);
   const hospitalsignup = async (hospitalData: Hospital) => {
-    const response = await fetch("/auth/hospitalreg", {
+    const response = await fetch("/api/auth/hospitalreg", {
       method: "POST",
       credentials: "include",
       headers: { "content-type": "application/json" },
@@ -87,7 +87,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(data.data);
   }
   const login = async (userData: UserQuery) => {
-    const response = await fetch("auth/login", {
+    const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "content-type": "application/json" },
       credentials: "include",
@@ -118,7 +118,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       pincode: userData.pincode,
       role: userData.role,
     };
-    const response = await fetch("/auth/register", {
+    const response = await fetch("/api/auth/register", {
       method: "POST",
       credentials: "include",
       headers: { "content-type": "application/json" },

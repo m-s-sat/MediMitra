@@ -23,7 +23,7 @@ export const LoginPage: React.FC = () => {
   const [showComingSoonModal, setShowComingSoonModal] = useState(false);
 
   const handleGoogleRedirect = () => {
-    window.location.href = '/auth/google';
+    window.location.href = '/api/auth/google';
   };
 
   const handleSendLink = async () => {
