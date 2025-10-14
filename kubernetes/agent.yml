@@ -15,7 +15,7 @@ spec:
         app: agent
     spec:
       containers:
-      - name: agent
+      - name: medimitra-agent
         image: mrinal672/medimitra-agent
         ports:
         - containerPort: 80
