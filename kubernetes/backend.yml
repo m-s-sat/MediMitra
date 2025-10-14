@@ -19,3 +19,55 @@ spec:
         image: mrinal672/medimitra-backend
         ports:
         - containerPort: 80
+        env:
+          - name: MONGOURI
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-backend-secret
+                key: mongouri
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-backend-secret
+                key: secret_key
+          - name: GOOGLE_CLIENTID
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-backend-secret
+                key: google_clientid
+          - name: GOOGLE_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-backend-secret
+                key: google_client_secret
+          - name: SALT
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-backend-secret
+                key: salt
+          - name: EMAIL
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-backend-secret
+                key: email
+          - name: EMAIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-backend-secret
+                key: email_password
+          - name: CALLBACKURL
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-backend-secret
+                key: callbackurl
+          - name: PROFILELINK
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-backend-secret
+                key: profilelink
+          - name: REDIRECT_DASHBOARD
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-backend-secret
+                key: redirect_dashboard
+      
