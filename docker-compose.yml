@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   frontend:
-    image: medimitra/frontend
+    image: mrinal672/medimitra-frontend
     container_name: frontend
     build:
       context: .
@@ -13,7 +13,7 @@ services:
       - backend
       - agent
   backend:
-    image: medimitra/backend
+    image: mrinal672/medimitra-backend
     container_name: backend
     build:
       context: .
@@ -24,7 +24,7 @@ services:
       - backend/.env
 
   agent:
-    image: medimitra/agent
+    image: mrinal672/medimitra-agent
     container_name: agent
     build:
       context: .
