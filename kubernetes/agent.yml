@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medimitra-agent
+  labels:
+    app: agent
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: agent
+  template:
+    metadata:
+      labels:
+        app: agent
+    spec:
+      containers:
+      - name: agent
+        image: mrinal672/medimitra-agent
+        ports:
+        - containerPort: 80
