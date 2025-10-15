@@ -5,7 +5,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: medimitra-ingress
+  ingressClassName: nginx
   rules:
   - host: medimitra.ms-sat.xyz
     http:
