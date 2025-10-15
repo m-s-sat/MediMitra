@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: medimitra-ingress
   annotations:
-    nginx.ingress.kubernetes.io/use-regex: true
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
     - host: medimitra.ms-sat.xyz
