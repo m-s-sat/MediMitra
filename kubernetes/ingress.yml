@@ -7,9 +7,8 @@ metadata:
 spec:
   ingressClassName: medimitra-ingress
   rules:
+  - host: medimitra.ms-sat.xyz
   - http:
-      hosts:
-      - medimitra.ms-sat.xyz
       paths:
       - path: /
         pathType: Prefix
