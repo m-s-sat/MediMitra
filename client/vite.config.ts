@@ -10,12 +10,12 @@ export default defineConfig({
   server:{
     proxy:{
       '/api':{
-        target: 'http://backend:5001',
+        target: 'http://localhost:5001',
         changeOrigin: true,
         secure: false,
       },
       '/agent': {
-        target: 'http://agent:8000',
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
       }
