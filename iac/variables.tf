@@ -9,3 +9,4 @@ variable "cluster_name" {
   type        = string
   default     = "medimitra-eks-cluster"
 }
+##
