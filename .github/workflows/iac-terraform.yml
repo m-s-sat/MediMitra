@@ -14,12 +14,14 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  BUCKET_TF_STATE: ${{ secrets.BUCKET_NAME }}
   AWS_REGION: us-east-1
 jobs:
   terraform:
     runs-on: ubuntu-latest
     defaults:
       run:
+        shell: bash
         working-directory: ./iac
     steps:
       - name: Checkout code
@@ -33,11 +35,17 @@ jobs:
           aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       - name: terraform init
-        run: terraform init
+        run: terraform init -backend-config="bucket=${{ env.BUCKET_TF_STATE }}"
         id: init
       - name: terraform validate
         run: terraform validate
         id: validate
       - name: terraform plan
-        run: terraform plan
+        run: terraform plan -out=planfile --no-color
         id: plan
+        continue-on-error: true
+      - name: check plan status
+        if: steps.plan.outcome == 'failure'
+        run: |
+          echo "Terraform plan failed. Exiting."
+          exit 1
