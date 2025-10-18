@@ -1,0 +1,42 @@
+name: Terraform
+on:
+  push:
+    branches:
+      - main
+      - stage
+    paths:
+      - 'iac/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'iac/**'
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: us-east-1
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5.0.0
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+      - name: change directory
+        run: cd iac
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.0
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: terraform init
+        run: terraform init
+        id: init
+      - name: terraform validate
+        run: terraform validate
+        id: validate
+      - name: terraform plan
+        run: terraform plan
+        id: plan
