@@ -1,10 +1,10 @@
 module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
+  source = "terraform-aws-modules/vpc/aws"
 
   name = "my-vpc"
   cidr = "172.20.0.0/16"
 
-  azs             = slice(data.aws_availability_zone.available.name, 0, 3)
+  azs             = slice(data.aws_availability_zones.available.names, 0, 3)
   private_subnets = ["172.20.1.0/24", "172.20.1.0/24", "172.20.1.0/24"]
   public_subnets  = ["172.20.1.0/24", "172.20.1.0/24", "172.20.1.0/24"]
 
