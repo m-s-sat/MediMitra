@@ -18,13 +18,14 @@ env:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./iac
     steps:
       - name: Checkout code
         uses: actions/checkout@v5.0.0
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.1.2
-      - name: change directory
-        run: cd iac
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v5.1.0
         with:
