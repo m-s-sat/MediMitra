@@ -52,7 +52,7 @@ jobs:
           exit 1
       - name: terraform apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -no-color planfile -parallelism=1
+        run: terraform apply -auto-approve -no-color -parallelism=1 planfile
         id: apply
       - name: get kube config
         if: steps.apply.outcome == 'success'
