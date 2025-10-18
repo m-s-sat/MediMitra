@@ -16,6 +16,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   BUCKET_TF_STATE: ${{ secrets.BUCKET_NAME }}
   AWS_REGION: us-east-1
+  EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER }}
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -49,3 +50,15 @@ jobs:
         run: |
           echo "Terraform plan failed. Exiting."
           exit 1
+      - name: terraform apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -no-color planfile -parallelism=1
+        id: apply
+      - name: get kube config
+        if: steps.apply.outcome == 'success'
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }}
+        id: get-kube-config
+      - name: install ingress controller
+        if: steps.apply.outcome == 'success' && steps.get-kube-config.outcome == 'success'
+        run: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.13.3/deploy/static/provider/aws/deploy.yaml
