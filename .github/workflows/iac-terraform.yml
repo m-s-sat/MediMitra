@@ -62,3 +62,16 @@ jobs:
       - name: install ingress controller
         if: steps.apply.outcome == 'success' && steps.get-kube-config.outcome == 'success'
         run: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.13.3/deploy/static/provider/aws/deploy.yaml
+        id: install-ingress
+      - name: terraform destroy
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.apply.outcome == 'true'
+        run: terraform destroy -auto-approve -no-color
+        id: destroy
+      - name: cleanup kube config
+        if: steps.destroy.outcome == 'success'
+        run: |
+          rm -rf ~/.kube
+        id: cleanup-kube-config
+      - name: delete ingress controller
+        if: steps.destroy.outcome == 'success' && steps.install-ingress.outcome == 'success'
+        run: kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.13.3/deploy/static/provider/aws/deploy.yaml
