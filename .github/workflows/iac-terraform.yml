@@ -1,0 +1,77 @@
+name: IAC-Terraform
+on:
+  push:
+    branches:
+      - main
+      - stage
+    paths:
+      - 'iac/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'iac/**'
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  BUCKET_TF_STATE: ${{ secrets.BUCKET_NAME }}
+  AWS_REGION: us-east-1
+  EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER }}
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./iac
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5.0.0
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.0
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: terraform init
+        run: terraform init -backend-config="bucket=${{ env.BUCKET_TF_STATE }}"
+        id: init
+      - name: terraform validate
+        run: terraform validate
+        id: validate
+      - name: terraform plan
+        run: terraform plan -out=planfile -no-color
+        id: plan
+        continue-on-error: true
+      - name: check plan status
+        if: steps.plan.outcome == 'failure'
+        run: |
+          echo "Terraform plan failed. Exiting."
+          exit 1
+      - name: terraform apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -no-color planfile -parallelism=1
+        id: apply
+      - name: get kube config
+        if: steps.apply.outcome == 'success'
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }}
+        id: get-kube-config
+      - name: install ingress controller
+        if: steps.apply.outcome == 'success' && steps.get-kube-config.outcome == 'success'
+        run: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.13.3/deploy/static/provider/aws/deploy.yaml
+        id: install-ingress
+      - name: terraform destroy
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.apply.outcome == 'true'
+        run: terraform destroy -auto-approve -no-color
+        id: destroy
+      - name: cleanup kube config
+        if: steps.destroy.outcome == 'success'
+        run: |
+          rm -rf ~/.kube
+        id: cleanup-kube-config
+      - name: delete ingress controller
+        if: steps.destroy.outcome == 'success' && steps.install-ingress.outcome == 'success'
+        run: kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.13.3/deploy/static/provider/aws/deploy.yaml
