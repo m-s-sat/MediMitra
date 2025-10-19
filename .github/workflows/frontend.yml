@@ -1,0 +1,35 @@
+name: Medimitra CI/CD Pipeline
+on: workflow_dispatch
+jobs:
+  BUILD_AND_DEPLOY:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./frontend
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Set up nodejs
+        uses: actions/setup-node@v6.0.0
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Application
+        run: npm run build
+
+      - name: build and push docker image
+        uses: docker://ghcr.io/kciter/aws-ecr-action:latest
+        with:
+          access_key_id: ${{ secrets.AWS_ACCESS_KEY }}
+          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+          repo: medimitra-frontend
+          region: us-east-1
+          tags: latest,${{ github.sha }}
+          create_repo: true
+          image_scanning_configuration: true
+          set_repo_policy: true
+          repo_policy_file: repo-policy.json
