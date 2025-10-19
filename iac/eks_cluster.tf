@@ -17,7 +17,6 @@ module "eks" {
       min_size       = 1
       max_size       = 2
       desired_size   = 1
-      ami_type       = "AL2_x86_64"
     }
     two = {
       name           = "node-group-2"
@@ -25,7 +24,6 @@ module "eks" {
       min_size       = 1
       max_size       = 2
       desired_size   = 1
-      ami_type       = "AL2_x86_64"
     }
   }
 
