@@ -1,5 +1,11 @@
 name: Medimitra CI/CD Pipeline
 on: workflow_dispatch
+env:
+  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_REGION: us-east-1
+  AWS_REGISTRY: medomitra-frontend
 jobs:
   BUILD_AND_DEPLOY:
     runs-on: ubuntu-latest
