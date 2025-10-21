@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medimitra-agent
+  labels:
+    app: agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent
+  template:
+    metadata:
+      labels:
+        app: agent
+    spec:
+      containers:
+      - name: medimitra-agent
+        image: {{ .Values.agentimage }}:{{ .Values.agenttag }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+          - name: GOOGLE_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-agent-secret
+                key: google_api_key
+          - name: MONGOURI
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-agent-secret
+                key: mongouri
+          - name: DBNAME
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-agent-secret
+                key: dbname
+          - name: BHUVAN_ACCESS_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-agent-secret
+                key: bhuvan_access_token
+          - name: LANGSMITH_TRACING
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-agent-secret
+                key: langsmith_tracing
+          - name: LANGSMITH_ENDPOINT
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-agent-secret
+                key: langsmith_endpoint
+          - name: LANGSMITH_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-agent-secret
+                key: langsmith_api_key
+          - name: LANGSMITH_PROJECT
+            valueFrom:
+              secretKeyRef:
+                name: medimitra-agent-secret
+                key: langsmith_project

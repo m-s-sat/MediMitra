@@ -1,7 +1,15 @@
-name: Backend CI
+name: Medimitra CI/CD Pipeline Backend
 on: workflow_dispatch
+env:
+  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_REGION: us-east-1
+  ECR_BACKEND_REGISTRY: ${{ secrets.ECR_BACKEND_REGISTRY }}
+  ECR_BACKEND_REPO: medimitra-backend
+  EKS_CLUSTER: medimitra-eks-cluster
 jobs:
-  build:
+  BUILD_AND_PUBLISH:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -9,17 +17,50 @@ jobs:
         working-directory: ./backend
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5.0.0
+
       - name: build and push docker image
         uses: docker://ghcr.io/kciter/aws-ecr-action:latest
         with:
-          access_key_id: ${{ secrets.AWS_ACCESS_KEY }}
-          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          account_id: ${{ secrets.AWS_ACCOUNT_ID }}
-          repo: medimitra-backend
+          access_key: ${{ env.AWS_ACCESS_KEY }}
+          secret_key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          registry: ${{ env.ECR_BACKEND_REGISTRY }}
+          repo: ${{ env.ECR_BACKEND_REPO }}
           region: us-east-1
-          tags: latest,${{ github.sha }}
-          create_repo: true
-          image_scanning_configuration: true
-          set_repo_policy: true
-          repo_policy_file: repo-policy.json
+          tags: latest,${{ github.run_number }}
+          daemon_off: false
+          dockerfile: backend/Dockerfile
+          context: backend
+  
+  DeployToEKS:
+    needs: BUILD_AND_PUBLISH
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5.0.0
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.0
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: update kube config
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER }} --region ${{ env.AWS_REGION }}
+
+      - name: Login to ecr
+        run: kubectl create secret docker-registry regcred --docker-server=${{ env.ECR_BACKEND_REGISTRY }} --docker-username=AWS --docker-password=$(aws ecr get-login-password)"
+
+      - name: Deploy Helm
+        uses: bitovi/github-actions-deploy-eks-helm@v1.2.12
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          cluster-name: ${{ env.EKS_CLUSTER }}
+          chart-path: helm/medimitra-charts
+          namespace: default
+          values: backendimage=${{ env.ECR_BACKEND_REGISTRY }}/${{ env.ECR_BACKEND_REPO }},backendtag=latest
+          name: medimitra-backend
