@@ -9,7 +9,7 @@ module "vpc" {
   public_subnets  = ["172.20.4.0/24", "172.20.5.0/24", "172.20.6.0/24"]
 
   enable_nat_gateway = true
-  enable_vpn_gateway = true
+  enable_vpn_gateway = false
   single_nat_gateway = true
 
   public_subnet_tags = {
