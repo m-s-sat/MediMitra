@@ -9,8 +9,8 @@ module "vpc" {
   public_subnets  = ["172.20.4.0/24", "172.20.5.0/24", "172.20.6.0/24"]
 
   enable_nat_gateway = true
-  enable_vpn_gateway = false
   single_nat_gateway = true
+  enable_dns_hostnames = true
 
   public_subnet_tags = {
     "kubernetes.io/cluster/${local.cluster_name}" = "shared"
@@ -21,4 +21,3 @@ module "vpc" {
     "kubernetes.io/role/internal-elb"            = 1
   }
 }
-#####
