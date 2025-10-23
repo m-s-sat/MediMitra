@@ -1,16 +1,16 @@
 output "cluster_name" {
-  description = "cluster name of the eks"
+  description = "Amazon Web Service EKS Cluster Name"
   value       = module.eks.cluster_name
 }
 output "cluster_endpoint" {
-  description = "cluster endpoint of the eks"
+  description = "Endpoint for Amazon Web Service EKS "
   value       = module.eks.cluster_endpoint
 }
 output "region" {
-  description = "cluster region"
+  description = "Amazon Web Service EKS Cluster region"
   value       = var.region
 }
 output "cluster_security_group_id" {
-  description = "cluster security group id"
+  description = "Security group ID for the Amazon Web Service EKS Cluster "
   value       = module.eks.cluster_security_group_id
 }
