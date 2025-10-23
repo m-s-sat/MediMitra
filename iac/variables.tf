@@ -1,7 +1,7 @@
 variable "region" {
   description = "Availability region"
   type        = string
-  default     = "us-east-1"
+  default     = "us-east-2"
 }
 
 variable "cluster_name" {
