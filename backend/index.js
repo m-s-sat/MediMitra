@@ -209,7 +209,7 @@ server.post('/api/chat_message', isAuth, (req, res) => {
 });
 
 server.get(/.*/, (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
 });
 
 httpServer.listen(process.env.PORT || 5000, () => {
