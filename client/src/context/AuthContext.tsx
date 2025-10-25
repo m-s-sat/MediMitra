@@ -131,7 +131,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = async () => {
-    const response = await fetch("/auth/logout", {
+    const response = await fetch("/api/auth/logout", {
       credentials: "include",
     });
     if (!response.ok) throw new Error("Unable to logout the user");
