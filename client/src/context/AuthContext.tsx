@@ -99,6 +99,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!response.ok) {
       alert("Unauthorized! Please check your credentials.");
       throw new Error("Unauthorized");
+      return;
     }
     const data = await response.json();
     if(data.role==='patient') setUser(data);
@@ -147,11 +148,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         headers: {'content-type':'application/json'},
         body: JSON.stringify(newUserData),
       })
-      const data = await response.json();
       if (!response.ok) {
-        console.error("Error updating user:", data.message);
+        console.error("Error updating user:", response.statusText);
         return;
       }
+      const data = await response.json();
       setUser(data.data);
     }
   };

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, User, Phone, Globe, Building2, Stethoscope } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+
 export const SignupPage: React.FC = () => {
   const { t } = useLanguage();
   const [selectedRole, setSelectedRole] = useState<'patient' | 'hospital' | 'doctor'>('patient');
@@ -18,7 +19,7 @@ export const SignupPage: React.FC = () => {
     agreeToTerms: false
   });
   const handleGoogleRedirect = () => {
-    window.location.href = 'http://localhost:5000/api/auth/google';
+    window.location.href = `${import.meta.env.VITE_DEV_GOOGLE_LINK}/api/auth/google`;
   };
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -65,8 +66,8 @@ export const SignupPage: React.FC = () => {
         role: selectedRole
       };
       signup(newUser);
-      if(selectedRole === 'patient') navigate('/dashboard');
-      else if(selectedRole === 'hospital') navigate('/hospital/dashboard');
+      if(selectedRole === 'patient') return navigate('/dashboard');
+      else if(selectedRole === 'hospital') return navigate('/hospital/dashboard');
       // else navigate('/doctor/dashboard');
       setIsLoading(false);
     }, 1500);
