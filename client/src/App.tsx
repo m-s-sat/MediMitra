@@ -150,10 +150,6 @@ function AppContent() {
               </ProtectedRoute>
             } 
           />
-
-          <Route path="/hospital/dashboard" element={<HospitalDashboard />} />
-
-
           {/* Placeholder routes for other pages */}
           <Route 
             path="/reports" 

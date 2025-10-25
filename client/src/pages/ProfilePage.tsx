@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useLocation } from "react-router-dom";
 import {
   User,
   Camera,
@@ -150,19 +149,16 @@ export const ProfilePage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch("/auth/profileupdate", {
+      const response = await fetch("/api/auth/profileupdate", {
         credentials: "include",
         method: "PATCH",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(profileData),
       });
-
-      const result = await response.json();
-
       if (!response.ok) {
-        throw new Error(result.message || "Failed to update profile.");
+        throw new Error("Failed to update profile.");
       }
-
+      const result = await response.json();
       updateUser(result.data);
       alert(result.message);
       setIsEditing(false);

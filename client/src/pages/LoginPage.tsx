@@ -21,9 +21,8 @@ export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [isSendLoading, setIsSendLoading] = useState(false);
   const [showComingSoonModal, setShowComingSoonModal] = useState(false);
-
   const handleGoogleRedirect = () => {
-    window.location.href = 'http://localhost:5000/api/auth/google';
+    window.location.href = `${import.meta.env.VITE_DEV_GOOGLE_LINK}/api/auth/google`;
   };
 
   const handleSendLink = async () => {
