@@ -3,7 +3,7 @@ module "eks" {
   version = "~> 21.0"
 
   name    = local.cluster_name
-  kubernetes_version = "1.34"
+  kubernetes_version = "1.30"
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
@@ -27,5 +27,4 @@ module "eks" {
     #   desired_size   = 1
     # }
   }
-  depends_on = [ module.vpc ]
 }

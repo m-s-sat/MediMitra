@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.1.2"
+  version = "5.3.0"
 
   name = "medimitra-eks"
 
@@ -11,7 +11,7 @@ module "vpc" {
   public_subnets  = ["172.20.4.0/24", "172.20.5.0/24", "172.20.6.0/24"]
 
   enable_nat_gateway   = true
-  single_nat_gateway   = true
+  single_nat_gateway   = false
   enable_dns_hostnames = true
 
   public_subnet_tags = {
