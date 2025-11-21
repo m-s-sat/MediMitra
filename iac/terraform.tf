@@ -21,7 +21,8 @@ terraform {
       version = "~> 2.38.0"
     }
   }
-
+  required_version = ">= 1.6.0"
+  
   backend "s3" {
     bucket = "medimitra-tfstate-us-east-2"
     key    = "terraform.tfstate"
