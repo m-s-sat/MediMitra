@@ -290,7 +290,6 @@ export const Dashboard: React.FC = () => {
               <QuickActionCard
                 key={index}
                 {...action}
-                index={index}
               />
             ))}
           </div>
