@@ -125,6 +125,7 @@ export interface Language {
   flag: string;
 }
 export interface Doctor {
+  id?: string;
   name: string | '';
   specialization: string | '';
   registrationNumber: string | '';
@@ -136,6 +137,30 @@ export interface Doctor {
   opdDays: string[] | [];
   isVerified?: boolean;
 }
+export interface Service {
+  id: string;
+  name: string;
+  category: string;
+  departmentId: string;
+  description: string;
+  isActive: boolean;
+}
+
+export interface Accreditation {
+  id: string;
+  name: string;
+  validityDate: string;
+  issuedBy: string;
+}
+
+export interface DepartmentDetail {
+  id: string;
+  name: string;
+  status: 'active' | 'archived';
+  headOfDepartment: string;
+  services: string[];
+}
+
 export interface Hospital {
   role: string;
   hospital?: {
@@ -150,6 +175,14 @@ export interface Hospital {
     };
     state?: string;
     district?: string;
+    slogan?: string;
+    primarySpecialization?: string;
+    establishmentDate?: string;
+    aboutUs?: string;
+    pincode?: string;
+    website?: string;
+    emergencyPhone?: string;
+    mainPhone?: string;
   };
   admin?: {
     name?: string;
@@ -158,6 +191,14 @@ export interface Hospital {
     password?: string;
   };
   departments?: string[];
+  departmentDetails?: DepartmentDetail[];
+  services?: Service[];
+  accreditations?: Accreditation[];
+  taxInfo?: {
+    gstNumber: string;
+    panNumber: string;
+    otherTaxIds: string[];
+  };
   emergency_contact?: string;
   visiting_hours?: {
     start?: string;
@@ -174,4 +215,8 @@ export interface HospitalFound {
   address: string;
   state: string;
   district: string;
+}
+
+export interface SignupRequest extends Omit<User, 'id'> {
+  password: string;
 }

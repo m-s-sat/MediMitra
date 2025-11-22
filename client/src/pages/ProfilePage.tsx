@@ -16,7 +16,8 @@ import {
   Download,
   Eye,
 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useCheckUserStatusQuery, useUpdateUserMutation } from "../store/api/authApi";
+import { User as UserType } from "../types";
 import TimeAgo from "../components/Timeago";
 
 interface ProfileData {
@@ -44,7 +45,10 @@ interface ProfileData {
 }
 
 export const ProfilePage: React.FC = () => {
-  const { user, updateUser, isLoading } = useAuth();
+  const { data: userData } = useCheckUserStatusQuery();
+  const [updateUserMutation] = useUpdateUserMutation();
+  const user = userData as UserType;
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<
     "basic" | "medical" | "measurements" | "documents" | "tracker"
@@ -112,7 +116,7 @@ export const ProfilePage: React.FC = () => {
     },
     lastUpdated: user?.weeklyLogs?.lastUpdated || new Date(),
   });
-    
+
   const [documents] = useState([
     {
       id: "1",
@@ -149,22 +153,12 @@ export const ProfilePage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch("/api/auth/profileupdate", {
-        credentials: "include",
-        method: "PATCH",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(profileData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update profile.");
-      }
-      const result = await response.json();
-      updateUser(result.data);
-      alert(result.message);
+      await updateUserMutation(profileData as any).unwrap();
+      alert("Profile updated successfully");
       setIsEditing(false);
     } catch (error: any) {
       console.error("Save failed:", error);
-      alert(`Error: ${error.message}`);
+      alert(`Error: ${error.message || "Failed to update profile"}`);
     }
   };
 
@@ -207,10 +201,16 @@ export const ProfilePage: React.FC = () => {
     { id: "documents", label: "Documents", icon: FileText },
     { id: "tracker", label: "Weekly Tracker", icon: Activity },
   ];
-  const handleWeeklySave = ()=>{
-    console.log(weeklyLog);
-    updateUser({weeklyLogs: weeklyLog});
-  }
+
+  const handleWeeklySave = async () => {
+    try {
+      await updateUserMutation({ weeklyLogs: weeklyLog }).unwrap();
+      alert("Weekly log updated successfully");
+    } catch (error: any) {
+      console.error("Weekly save failed:", error);
+      alert("Failed to update weekly log");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
@@ -268,11 +268,11 @@ export const ProfilePage: React.FC = () => {
               <div className="text-center mb-6">
                 <div className="relative inline-block">
                   <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center mb-3">
-                    {user?.avatar ? <img src={user.avatar} alt="User photo" className="w-full h-full object-cover rounded-full"></img> :<span className="text-white text-2xl font-bold">
+                    {user?.avatar ? <img src={user.avatar} alt="User photo" className="w-full h-full object-cover rounded-full"></img> : <span className="text-white text-2xl font-bold">
                       {profileData.name.charAt(0).toUpperCase()}
                     </span>}
                   </div>
-                  {user?.password==='google'? null: <button
+                  {(user as any)?.password === 'google' ? null : <button
                     onClick={handleFileUpload}
                     className="absolute -bottom-1 -right-1 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors"
                   >
@@ -297,8 +297,8 @@ export const ProfilePage: React.FC = () => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left ${activeTab === tab.id
-                        ? "bg-blue-50 text-blue-600 border border-blue-200"
-                        : "text-gray-700 hover:bg-gray-50"
+                      ? "bg-blue-50 text-blue-600 border border-blue-200"
+                      : "text-gray-700 hover:bg-gray-50"
                       }`}
                   >
                     <tab.icon className="w-5 h-5" />
@@ -666,10 +666,10 @@ export const ProfilePage: React.FC = () => {
                           <FileText className="w-8 h-8 text-blue-600" />
                           <span
                             className={`px-2 py-1 text-xs rounded-full ${doc.type === "report"
-                                ? "bg-blue-100 text-blue-600"
-                                : doc.type === "prescription"
-                                  ? "bg-green-100 text-green-600"
-                                  : "bg-purple-100 text-purple-600"
+                              ? "bg-blue-100 text-blue-600"
+                              : doc.type === "prescription"
+                                ? "bg-green-100 text-green-600"
+                                : "bg-purple-100 text-purple-600"
                               }`}
                           >
                             {doc.type}
@@ -839,22 +839,22 @@ export const ProfilePage: React.FC = () => {
                         onChange={(e) =>
                           setWeeklyLog((prev) => ({
                             ...prev,
-                            energyLevel: e.target.value as any,
+                            energyLevel: e.target.value,
                           }))
                         }
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
+                        <option value="">Select Level</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Exercise Frequency (times/week)
+                        Exercise Frequency
                       </label>
-                      <input
-                        type="number"
+                      <select
                         value={weeklyLog.exerciseFrequency}
                         onChange={(e) =>
                           setWeeklyLog((prev) => ({
@@ -863,61 +863,25 @@ export const ProfilePage: React.FC = () => {
                           }))
                         }
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
+                      >
+                        <option value="">Select Frequency</option>
+                        <option value="None">None</option>
+                        <option value="1-2 times/week">1-2 times/week</option>
+                        <option value="3-4 times/week">3-4 times/week</option>
+                        <option value="5+ times/week">5+ times/week</option>
+                      </select>
                     </div>
                   </div>
 
-                  <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      Condition-Specific Metrics
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Blood Sugar (mg/dL)
-                        </label>
-                        <input
-                          type="number"
-                          value={weeklyLog.conditionSpecific.bloodSugar}
-                          onChange={(e) =>
-                            setWeeklyLog((prev) => ({
-                              ...prev,
-                              conditionSpecific: {
-                                ...prev.conditionSpecific,
-                                bloodSugar: e.target.value,
-                              },
-                            }))
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Pain Score (1-10)
-                        </label>
-                        <input
-                          type="number"
-                          min="1"
-                          max="10"
-                          value={weeklyLog.conditionSpecific.painScore}
-                          onChange={(e) =>
-                            setWeeklyLog((prev) => ({
-                              ...prev,
-                              conditionSpecific: {
-                                ...prev.conditionSpecific,
-                                painScore: e.target.value,
-                              },
-                            }))
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-                    </div>
+                  <div className="flex justify-end">
+                    <button
+                      onClick={handleWeeklySave}
+                      className="flex items-center space-x-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-lg hover:shadow-xl"
+                    >
+                      <Save className="w-5 h-5" />
+                      <span>Save Weekly Log</span>
+                    </button>
                   </div>
-
-                  <button onClick={handleWeeklySave} className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-emerald-700 transition-all">
-                    Save Weekly Log
-                  </button>
                 </div>
               )}
             </motion.div>

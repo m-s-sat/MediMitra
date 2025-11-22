@@ -1,7 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { LanguageProvider } from './context/LanguageContext';
 import { Header } from './components/Header';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
@@ -15,83 +13,90 @@ import { ProfilePage } from './pages/ProfilePage';
 import { MyMedicinesPage } from './pages/MyMedicinesPage';
 import { HelpdeskPage } from './pages/HelpdeskPage';
 import { HospitalDashboard } from './pages/HospitalDashboard';
-import HospitalProfile from './pages/HospitalProfile.tsx';
+import {HospitalProfile} from './pages/HospitalProfile.tsx';
 import { PasswordResetPage } from './pages/PasswordResetPage.tsx';
+import { useCheckUserStatusQuery } from './store/api/authApi';
+import { User, Hospital } from './types';
 
-// Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+  const { data: user, isLoading } = useCheckUserStatusQuery();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  return user ? <>{children}</> : <Navigate to="/login" />;
 };
 
-// Public Route Component (redirect to dashboard if authenticated)
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, user, loginHospital } = useAuth();
-  if(!isAuthenticated) return <>{children}</>;
-  if(user?.role === 'patient') {
-    return <Navigate to="/dashboard" />;
+  const { data: user, isLoading } = useCheckUserStatusQuery();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (user) {
+    if ((user as User).role === 'patient') {
+      return <Navigate to="/dashboard" />;
+    }
+    if ((user as Hospital).role === 'hospital') {
+      return <Navigate to="/hospital/dashboard" />;
+    }
   }
-  if(loginHospital?.role === 'hospital') {
-    return <Navigate to="/hospital/dashboard" />;
-  }
-  return children;
+  return <>{children}</>;
 };
 
-function AppContent() {
+function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
         <Header />
         <Routes>
           {/* Public Routes */}
-          <Route 
-            path="/" 
+          <Route
+            path="/"
             element={
               <PublicRoute>
                 <LandingPage />
               </PublicRoute>
-            } 
+            }
           />
-          <Route 
-            path="/login" 
+          <Route
+            path="/login"
             element={
               <PublicRoute>
                 <LoginPage />
               </PublicRoute>
-            } 
+            }
           />
-          <Route 
-            path="/signup" 
+          <Route
+            path="/signup"
             element={
               <PublicRoute>
                 <SignupPage />
               </PublicRoute>
-            } 
+            }
           />
-          <Route 
-            path="/signup/hospital" 
+          <Route
+            path="/signup/hospital"
             element={
               <PublicRoute>
                 <HospitalSignupPage />
               </PublicRoute>
-            } 
+            }
           />
           <Route
             path='/password-reset'
             element={
               <PublicRoute>
-              <PasswordResetPage></PasswordResetPage>
+                <PasswordResetPage />
               </PublicRoute>
             }
-          ></Route>
+          />
           {/* Protected Routes */}
-          <Route 
-            path="/dashboard" 
+          <Route
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
-            } 
+            }
           />
           <Route
             path='/hospital/dashboard'
@@ -100,59 +105,51 @@ function AppContent() {
                 <HospitalDashboard />
               </ProtectedRoute>
             }
-          ></Route>
+          />
           <Route
             path='/hospital/profile'
             element={
               <ProtectedRoute>
-                <HospitalProfile></HospitalProfile>
+                <HospitalProfile />
               </ProtectedRoute>
             }
-          ></Route>
-          <Route 
-            path="/appointments" 
+          />
+          <Route
+            path="/appointments"
             element={
               <ProtectedRoute>
                 <AppointmentsPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/chat" 
+          <Route
+            path="/chat"
             element={
               <ProtectedRoute>
                 <ChatPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/emergency" 
+          <Route
+            path="/emergency"
             element={
               <ProtectedRoute>
                 <EmergencyPage />
               </ProtectedRoute>
-            } 
+            }
           />
 
-          <Route 
-            path="/profile" 
+          <Route
+            path="/profile"
             element={
               <ProtectedRoute>
                 <ProfilePage />
               </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/hospital/dashboard" 
-            element={
-              <ProtectedRoute>
-                <HospitalDashboard />
-              </ProtectedRoute>
-            } 
+            }
           />
           {/* Placeholder routes for other pages */}
-          <Route 
-            path="/reports" 
+          <Route
+            path="/reports"
             element={
               <ProtectedRoute>
                 <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center">
@@ -162,18 +159,18 @@ function AppContent() {
                   </div>
                 </div>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/medicines" 
+          <Route
+            path="/medicines"
             element={
               <ProtectedRoute>
                 <MyMedicinesPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/visits" 
+          <Route
+            path="/visits"
             element={
               <ProtectedRoute>
                 <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center">
@@ -183,23 +180,23 @@ function AppContent() {
                   </div>
                 </div>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/helpdesk" 
+          <Route
+            path="/helpdesk"
             element={
               <ProtectedRoute>
                 <HelpdeskPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/mymedicines" 
+          <Route
+            path="/mymedicines"
             element={
               <ProtectedRoute>
                 <MyMedicinesPage />
               </ProtectedRoute>
-            } 
+            }
           />
 
           {/* Catch all route */}
@@ -207,16 +204,6 @@ function AppContent() {
         </Routes>
       </div>
     </Router>
-  );
-}
-
-function App() {
-  return (
-    <LanguageProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </LanguageProvider>
   );
 }
 

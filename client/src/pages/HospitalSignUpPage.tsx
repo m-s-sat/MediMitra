@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Select from 'react-select';
-import { 
-  Building2, 
-  Phone, 
-  Mail, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  Clock,
+import {
+  Building2,
+  Phone,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
   User,
   CheckCircle,
   ArrowLeft,
   Search,
   AlertCircle
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useHospitalSignupMutation } from '../store/api/authApi';
+import { useGetStatesQuery, useGetDistrictsQuery, useGetHospitalsQuery } from '../store/api/hospitalApi';
 import { Hospital, HospitalFound } from '../types';
 
 interface SelectOption {
@@ -32,16 +32,6 @@ const departments = [
 
 export const HospitalSignupPage: React.FC = () => {
   const navigate = useNavigate();
-  const {
-    hospitalsignup,
-    getStates,
-    getDistricts,
-    getHospitals,
-    states,
-    districts,
-    hospitals,
-    isLoading,
-  } = useAuth();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedState, setSelectedState] = useState('');
@@ -49,9 +39,8 @@ export const HospitalSignupPage: React.FC = () => {
   const [selectedHospital, setSelectedHospital] = useState<HospitalFound | null>(null);
   const [hospitalSearch, setHospitalSearch] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState({
     adminName: '',
     adminEmail: '',
@@ -62,45 +51,17 @@ export const HospitalSignupPage: React.FC = () => {
     visitingHours: { start: '09:00', end: '17:00' }
   });
 
-  useEffect(() => {
-    const fetchStates = async () => {
-      try {
-        await getStates();
-      } catch (err) {
-        console.error("Failed to fetch states on component mount:", err);
-        setError("Could not load states. Please check the connection and try refreshing.");
-      }
-    };
-    fetchStates();
-  }, [getStates]); // FIX: Add stable function to dependency array
-
-  useEffect(() => {
-    if (selectedState) {
-      const fetchDistricts = async () => {
-        try {
-          await getDistricts(selectedState);
-        } catch (err) {
-          console.error(`Failed to fetch districts for ${selectedState}:`, err);
-          setError(`Could not load districts for ${selectedState}.`);
-        }
-      };
-      fetchDistricts();
-    }
-  }, [selectedState, getDistricts]); // FIX: Add stable function to dependency array
-
-  useEffect(() => {
-    if (selectedState && selectedDistrict) {
-      const fetchHospitals = async () => {
-        try {
-          await getHospitals(selectedState, selectedDistrict);
-        } catch (err) {
-          console.error(`Failed to fetch hospitals for ${selectedDistrict}:`, err);
-          setError(`Could not load hospitals for ${selectedDistrict}.`);
-        }
-      };
-      fetchHospitals();
-    }
-  }, [selectedState, selectedDistrict, getHospitals]); // FIX: Add stable function to dependency array
+  // RTK Query Hooks
+  const { data: states = [], isLoading: isStatesLoading } = useGetStatesQuery();
+  const { data: districts = [], isLoading: isDistrictsLoading } = useGetDistrictsQuery(
+    { state: selectedState },
+    { skip: !selectedState }
+  );
+  const { data: hospitals = [], isLoading: isHospitalsLoading } = useGetHospitalsQuery(
+    { state: selectedState, district: selectedDistrict },
+    { skip: !selectedState || !selectedDistrict }
+  );
+  const [hospitalsignup, { isLoading: isSignupLoading }] = useHospitalSignupMutation();
 
   const handleStateChange = (stateValue: string) => {
     setError(null);
@@ -144,7 +105,6 @@ export const HospitalSignupPage: React.FC = () => {
       setError("Please select at least 3 departments.");
       return;
     }
-    setIsSubmitting(true);
 
     const payload: Hospital = {
       role: 'hospital',
@@ -168,17 +128,21 @@ export const HospitalSignupPage: React.FC = () => {
       visiting_hours: formData.visitingHours
     };
     try {
-      await hospitalsignup(payload);
+      await hospitalsignup(payload).unwrap();
       navigate('/hospital/dashboard');
     } catch (err) {
       console.error("Hospital registration failed:", err);
       setError("Registration failed. Please check your details and try again.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
+
   const stateOptions: SelectOption[] = states.map(s => ({ value: s, label: s }));
   const districtOptions: SelectOption[] = districts.map(d => ({ value: d, label: d }));
+
+  // Filter hospitals based on search
+  const filteredHospitals = hospitals.filter(h =>
+    h.hospital_name.toLowerCase().includes(hospitalSearch.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -216,7 +180,7 @@ export const HospitalSignupPage: React.FC = () => {
 
           {error && currentStep < 4 && (
             <div className="my-4 flex items-center p-3 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-              <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0"/>
+              <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
               <span className="font-medium">Error:</span>&nbsp;{error}
             </div>
           )}
@@ -230,7 +194,7 @@ export const HospitalSignupPage: React.FC = () => {
                 value={stateOptions.find(option => option.value === selectedState) || null}
                 placeholder="Search and select a state..."
                 isSearchable
-                isLoading={isLoading && !states.length}
+                isLoading={isStatesLoading}
               />
             </motion.div>
           )}
@@ -247,7 +211,7 @@ export const HospitalSignupPage: React.FC = () => {
                 value={districtOptions.find(option => option.value === selectedDistrict) || null}
                 placeholder="Search and select a district..."
                 isSearchable
-                isLoading={isLoading && !!selectedState && !districts.length}
+                isLoading={isDistrictsLoading}
                 isDisabled={!selectedState}
               />
             </motion.div>
@@ -264,9 +228,9 @@ export const HospitalSignupPage: React.FC = () => {
                 <input type="text" placeholder="Search hospitals..." value={hospitalSearch} onChange={(e) => setHospitalSearch(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
               </div>
               <div className="space-y-3 max-h-96 overflow-y-auto">
-                {isLoading && !hospitals.length && <p className="text-center text-gray-500">Loading hospitals...</p>}
-                {!isLoading && !hospitals.length && selectedDistrict && <p className="text-center text-gray-500">No hospitals found for this district.</p>}
-                {hospitals.map((hospital) => (
+                {isHospitalsLoading && <p className="text-center text-gray-500">Loading hospitals...</p>}
+                {!isHospitalsLoading && !filteredHospitals.length && selectedDistrict && <p className="text-center text-gray-500">No hospitals found.</p>}
+                {filteredHospitals.map((hospital) => (
                   hospital && hospital.hospital_name && (
                     <button key={hospital._id || hospital.hospital_name} onClick={() => handleHospitalSelect(hospital)} className="w-full p-4 border border-gray-200 rounded-lg hover:border-blue-600 hover:bg-blue-50 transition-colors text-left">
                       <div className="flex items-start justify-between">
@@ -284,7 +248,7 @@ export const HospitalSignupPage: React.FC = () => {
           )}
 
           {currentStep === 4 && selectedHospital && (
-             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold text-gray-900">Admin Details</h3>
                 <button onClick={() => setCurrentStep(3)} className="text-blue-600 hover:text-blue-700">Change Hospital</button>
@@ -298,7 +262,7 @@ export const HospitalSignupPage: React.FC = () => {
                 </div>
               </div>
               <form onSubmit={handleSubmit} className="space-y-6">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Admin Name *</label>
                     <div className="relative">
@@ -342,16 +306,16 @@ export const HospitalSignupPage: React.FC = () => {
                   </div>
                   <p className="text-xs text-gray-500 mt-2">Selected: {formData.departments.length} departments</p>
                 </div>
-                
+
                 {error && currentStep === 4 && (
                   <div className="flex items-center p-3 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-                    <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0"/>
+                    <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
                     <span className="font-medium">Error:</span>&nbsp;{error}
                   </div>
                 )}
 
-                <button type="submit" disabled={isSubmitting} className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                  {isSubmitting ? (
+                <button type="submit" disabled={isSignupLoading} className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                  {isSignupLoading ? (
                     <div className="flex items-center justify-center space-x-2">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       <span>Registering Hospital...</span>

@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, Phone, User, Building2, Stethoscope, ArrowLeft } from 'lucide-react';
-import { useAuth } from '../context/AuthContext.tsx';
-import { useLanguage } from '../context/LanguageContext';
+import { useSelector } from 'react-redux';
+import { useLoginMutation } from '../store/api/authApi';
+import { selectTranslation } from '../store/slices/languageSlice';
 import logo from "../assets/Logo.png";
 
 export const LoginPage: React.FC = () => {
-  const { login } = useAuth();
-  const { t } = useLanguage();
+  const [login, { isLoading }] = useLoginMutation();
+  const t = useSelector(selectTranslation);
   const navigate = useNavigate();
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -16,11 +17,11 @@ export const LoginPage: React.FC = () => {
   const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
   const [credentials, setCredentials] = useState({ emailOrPhone: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [email, setEmail] = useState("");
   const [isSendLoading, setIsSendLoading] = useState(false);
   const [showComingSoonModal, setShowComingSoonModal] = useState(false);
+
   const handleGoogleRedirect = () => {
     window.location.href = `${import.meta.env.VITE_DEV_GOOGLE_LINK}/api/auth/google`;
   };
@@ -31,36 +32,44 @@ export const LoginPage: React.FC = () => {
       return;
     }
     setIsSendLoading(true)
-    const response = await fetch('/api/auth/reset-request',{
-      method: "POST",
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: email }),
-    });
-    const data = await response.json();
-    alert(data.message);
-    setIsSendLoading(false);
+    try {
+      const response = await fetch('/api/auth/reset-request', {
+        method: "POST",
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: email }),
+      });
+      const data = await response.json();
+      alert(data.message);
+    } catch (error) {
+      console.error("Error sending reset link:", error);
+      alert("Failed to send reset link.");
+    } finally {
+      setIsSendLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    // BACKEND: Replace with real login API
-    setTimeout(() => {
+    try {
       const loginUser = {
         role: selectedRole,
         email: credentials.emailOrPhone,
         password: credentials.password
       };
-      login(loginUser);
+
+      const result = await login(loginUser).unwrap();
+
       // Redirect based on role
-      if (loginUser.role === 'hospital') {
-        navigate('/hospital/dashboard'); // BACKEND: change if needed
+      if (result.role === 'hospital' || ('hospital' in result)) {
+        navigate('/hospital/dashboard');
       } else {
         navigate('/dashboard');
       }
-      setIsLoading(false);
-    }, 1500);
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Login failed. Please check your credentials.");
+    }
   };
 
   // Lock scroll for forgot modal
@@ -87,29 +96,29 @@ export const LoginPage: React.FC = () => {
         className="max-w-md w-full space-y-8"
       >
         <div className="relative">
-  {currentStep === 2 && (
-    <button
-      onClick={() => setCurrentStep(1)}
-      className="absolute left-0 top-0 inline-flex items-center text-blue-600 hover:text-blue-700 mb-4"
-    >
-      <ArrowLeft className="w-4 h-4 mr-1" /> Back
-    </button>
-  )}
+          {currentStep === 2 && (
+            <button
+              onClick={() => setCurrentStep(1)}
+              className="absolute left-0 top-0 inline-flex items-center text-blue-600 hover:text-blue-700 mb-4"
+            >
+              <ArrowLeft className="w-4 h-4 mr-1" /> Back
+            </button>
+          )}
 
-  <div className="text-center">
-    <div className="flex justify-center mb-6 mt-6">
-      <div className="w-16 h-16 rounded-xl flex items-center justify-center">
-        <img src={logo} alt="MediMitra" className="max-h-full max-w-full object-contain" />
-      </div>
-    </div>
-    <h2 className="text-3xl font-bold text-gray-900 mb-2">
-      {currentStep === 1 ? "Select your role" : t('login.welcomeBack')}
-    </h2>
-    <p className="text-gray-600">
-      {currentStep === 1 ? "Login as a patient, hospital, or doctor" : t('login.signInToAccount')}
-    </p>
-  </div>
-</div>
+          <div className="text-center">
+            <div className="flex justify-center mb-6 mt-6">
+              <div className="w-16 h-16 rounded-xl flex items-center justify-center">
+                <img src={logo} alt="MediMitra" className="max-h-full max-w-full object-contain" />
+              </div>
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              {currentStep === 1 ? "Select your role" : t('login.welcomeBack')}
+            </h2>
+            <p className="text-gray-600">
+              {currentStep === 1 ? "Login as a patient, hospital, or doctor" : t('login.signInToAccount')}
+            </p>
+          </div>
+        </div>
 
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -252,7 +261,7 @@ export const LoginPage: React.FC = () => {
               </button>
 
               {/* Google Sign-In */}
-              {selectedRole==='patient' && <div className="mt-6 flex justify-center">
+              {selectedRole === 'patient' && <div className="mt-6 flex justify-center">
                 <button
                   onClick={handleGoogleRedirect}
                   className="flex items-center border border-gray-300 rounded-lg shadow-sm px-4 py-2 bg-white hover:bg-gray-50"

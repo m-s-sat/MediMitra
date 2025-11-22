@@ -1,8 +1,9 @@
 'use client'
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext.tsx';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import { setLanguage, selectCurrentLanguage, selectAvailableLanguages } from '../store/slices/languageSlice';
 
 interface LanguageSelectorProps {
   isOpen: boolean;
@@ -10,7 +11,9 @@ interface LanguageSelectorProps {
 }
 
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ isOpen, setIsOpen }) => {
-  const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
+  const dispatch = useDispatch();
+  const currentLanguage = useSelector(selectCurrentLanguage);
+  const availableLanguages = useSelector(selectAvailableLanguages);
 
   return (
     <div className="relative">
@@ -35,14 +38,13 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ isOpen, setI
               <button
                 key={language.code}
                 onClick={() => {
-                  setLanguage(language);
+                  dispatch(setLanguage(language));
                   setIsOpen(false);
                 }}
-                className={`flex items-center space-x-3 px-4 py-2 text-left w-full hover:bg-gray-50 transition-colors ${
-                  currentLanguage.code === language.code
+                className={`flex items-center space-x-3 px-4 py-2 text-left w-full hover:bg-gray-50 transition-colors ${currentLanguage.code === language.code
                     ? 'bg-blue-50 text-blue-600'
                     : 'text-gray-700'
-                }`}
+                  }`}
               >
                 <span className="text-lg">{language.flag}</span>
                 <div>

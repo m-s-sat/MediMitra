@@ -1,10 +1,13 @@
+
 // Updated ChatPage.tsx with mobile fixes
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Mic, MicOff, Volume2, VolumeX, Bot, User } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { Send, Mic, MicOff, Volume2, VolumeX, Bot, User as UserIcon } from 'lucide-react';
+import { useSelector } from 'react-redux';
 import ReactMarkdown from 'react-markdown';
-import { useAuth } from '../context/AuthContext';
+import { selectCurrentLanguage, selectTranslation } from '../store/slices/languageSlice';
+import { useCheckUserStatusQuery } from '../store/api/authApi';
+import { User } from '../types';
 
 interface Message {
   id: string;
@@ -23,7 +26,7 @@ const generateStreamingResponse = async (
   onEnd: () => void
 ) => {
   try {
-    const response = await fetch(`/agent/chat_message`, {
+    const response = await fetch(`/ agent / chat_message`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +40,7 @@ const generateStreamingResponse = async (
     });
 
     if (!response.ok || !response.body) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      throw new Error(`API Error: ${response.status} ${response.statusText} `);
     }
 
     const reader = response.body.getReader();
@@ -65,7 +68,7 @@ const generateStreamingResponse = async (
     }
   } catch (error) {
     console.error("Streaming failed:", error);
-    onChunk(`Sorry, an error occurred. ${(error as Error).message}`);
+    onChunk(`Sorry, an error occurred.${(error as Error).message} `);
   } finally {
     onEnd();
   }
@@ -73,8 +76,11 @@ const generateStreamingResponse = async (
 
 
 export const ChatPage: React.FC = () => {
-  const { currentLanguage, t } = useLanguage();
-  const { user } = useAuth();
+  const currentLanguage = useSelector(selectCurrentLanguage);
+  const t = useSelector(selectTranslation);
+  const { data: userData } = useCheckUserStatusQuery();
+  const user = userData as User;
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -88,7 +94,7 @@ export const ChatPage: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -111,7 +117,7 @@ export const ChatPage: React.FC = () => {
       timestamp: new Date(),
       language: currentLanguage.code
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
     setIsLoading(true);
@@ -124,7 +130,7 @@ export const ChatPage: React.FC = () => {
       timestamp: new Date(),
       language: currentLanguage.code
     };
-    
+
     setMessages(prev => [...prev, assistantMessage]);
 
     await generateStreamingResponse(
@@ -187,11 +193,10 @@ export const ChatPage: React.FC = () => {
             </span>
             <button
               onClick={toggleSpeaking}
-              className={`p-2 rounded-full transition-colors ${
-                isSpeaking
-                  ? 'bg-blue-100 text-blue-600'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+              className={`p - 2 rounded - full transition - colors ${isSpeaking
+                ? 'bg-blue-100 text-blue-600'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                } `}
             >
               {isSpeaking ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
             </button>
@@ -209,27 +214,24 @@ export const ChatPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} `}
             >
-              <div className={`flex items-start space-x-3 max-w-3xl ${
-                message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
-              }`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                  message.sender === 'user'
-                    ? 'bg-blue-600'
-                    : 'bg-gradient-to-r from-emerald-500 to-emerald-600'
-                }`}>
+              <div className={`flex items - start space - x - 3 max - w - 3xl ${message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
+                } `}>
+                <div className={`w - 8 h - 8 rounded - full flex items - center justify - center shrink - 0 ${message.sender === 'user'
+                  ? 'bg-blue-600'
+                  : 'bg-gradient-to-r from-emerald-500 to-emerald-600'
+                  } `}>
                   {message.sender === 'user' ? (
-                    <User className="w-4 h-4 text-white" />
+                    <UserIcon className="w-4 h-4 text-white" />
                   ) : (
                     <Bot className="w-4 h-4 text-white" />
                   )}
                 </div>
-                <div className={`rounded-2xl px-4 py-3 max-w-[85vw] ${
-                  message.sender === 'user'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-900 shadow-sm border border-gray-200'
-                }`}>
+                <div className={`rounded - 2xl px - 4 py - 3 max - w - [85vw] ${message.sender === 'user'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                  } `}>
                   <div className="text-sm leading-relaxed whitespace-pre-wrap">
                     <ReactMarkdown
                       components={{
@@ -245,14 +247,13 @@ export const ChatPage: React.FC = () => {
                     </ReactMarkdown>
                   </div>
 
-                  <p className={`text-xs mt-2 ${
-                    message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
-                  }`}>
-                    {message.timestamp.toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
+                  <p className={`text - xs mt - 2 ${message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                    } `}>
+                    {message.timestamp.toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit'
                     })}
-                    {message.isVoice && ` • ${t('chat.voiceMessageLabel')}`}
+                    {message.isVoice && ` • ${t('chat.voiceMessageLabel')} `}
                   </p>
                 </div>
               </div>
@@ -307,19 +308,18 @@ export const ChatPage: React.FC = () => {
                 <Send className="w-4 h-4" />
               </button>
             </div>
-            
+
             <button
               onClick={toggleRecording}
-              className={`p-3 rounded-full transition-all ${
-                isRecording
-                  ? 'bg-red-600 text-white animate-pulse'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+              className={`p - 3 rounded - full transition - all ${isRecording
+                ? 'bg-red-600 text-white animate-pulse'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                } `}
             >
               {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </button>
           </div>
-          
+
           {isRecording && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
@@ -332,7 +332,7 @@ export const ChatPage: React.FC = () => {
               <div className="w-2 h-2 bg-red-600 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
             </motion.div>
           )}
-          
+
           <div className="mt-3 text-center">
             <p className="text-xs text-gray-500">
               {t('chat.disclaimer')}

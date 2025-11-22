@@ -1,17 +1,48 @@
-'use client'
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, Menu, X, User, LogOut, Settings, Trash2, Clock } from 'lucide-react';
-import { useAuth } from '../context/AuthContext.tsx';
-import { useLanguage } from '../context/LanguageContext.tsx';
+import { Bell, Menu, X, User, LogOut, Trash2, Clock } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { useCheckUserStatusQuery, useLogoutMutation } from '../store/api/authApi';
+import { selectTranslation } from '../store/slices/languageSlice';
 import { LanguageSelector } from './LanguageSelector';
 import { motion, AnimatePresence } from 'framer-motion';
 import logo from '../assets/Logo.png';
+import { User as UserType, Hospital } from '../types';
+
+interface DisplayUser {
+  name: string | undefined;
+  avatar: string | undefined;
+  role: string | undefined;
+}
 
 export const Header: React.FC = () => {
-  const { user, logout, isAuthenticated } = useAuth();
-  const { t } = useLanguage();
+  const { data: userData, isSuccess } = useCheckUserStatusQuery();
+  const [logout] = useLogoutMutation();
+  const t = useSelector(selectTranslation);
   const navigate = useNavigate();
+
+  const isAuthenticated = isSuccess && !!userData;
+
+  // Helper to get display user info
+  const getDisplayUser = (): DisplayUser | null => {
+    if (!userData) return null;
+    if ('hospital' in userData) {
+      const hospitalData = userData as Hospital;
+      return {
+        name: hospitalData.hospital?.name || hospitalData.admin?.name || 'Hospital',
+        avatar: undefined,
+        role: 'hospital'
+      };
+    }
+    const user = userData as UserType;
+    return {
+      name: user.name,
+      avatar: user.avatar,
+      role: user.role
+    };
+  };
+
+  const user = getDisplayUser();
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -47,8 +78,8 @@ export const Header: React.FC = () => {
     };
   }, []);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
     setShowProfileMenu(false);
   };
@@ -60,7 +91,7 @@ export const Header: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to={isAuthenticated && user?.role === 'patient' ? '/dashboard' : user?.role==='hospital' ? '/hospital/dashboard' : '/'} className="flex items-center space-x-2">
+          <Link to={isAuthenticated && user?.role === 'patient' ? '/dashboard' : user?.role === 'hospital' ? '/hospital/dashboard' : '/'} className="flex items-center space-x-2">
             <div className="w-14 h-14 rounded-lg flex items-center justify-center">
               <img src={logo} alt="MediMitra" className="h-8 sm:h-10 md:h-12 lg:h-14 w-auto" />
             </div>
@@ -168,7 +199,7 @@ export const Header: React.FC = () => {
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
                         className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2"
                       >
-                        {user?.role==='patient' ? <Link
+                        {user?.role === 'patient' ? <Link
                           to="/profile"
                           className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                           onClick={() => setShowProfileMenu(false)}
@@ -251,17 +282,17 @@ export const Header: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    {user?.role==='patient' ? <Link
+                    {user?.role === 'patient' ? <Link
                       to="/profile"
                       className="block text-gray-700 hover:text-gray-900 transition-colors"
                       onClick={() => setShowMobileMenu(false)}
                     >
                       {t('header.profile')}
-                    </Link> : <Link 
+                    </Link> : <Link
                       to={'/hospital/profile'}
                       className='block text-gray-700 hover:text-gray-900 transition-colors'
                       onClick={() => setShowMobileMenu(false)}
-                      ></Link>}
+                    ></Link>}
                     <button
                       onClick={handleLogout}
                       className="block text-red-600 hover:text-red-700 transition-colors text-left"

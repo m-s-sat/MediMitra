@@ -1,21 +1,22 @@
 'use client'
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  AlertTriangle, 
-  Phone, 
-  MapPin, 
-  Navigation, 
+import {
+  AlertTriangle,
+  Phone,
+  MapPin,
+  Navigation,
   Clock,
   Heart,
   Stethoscope,
   Ambulance,
   Shield
 } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { useSelector } from 'react-redux';
+import { selectTranslation } from '../store/slices/languageSlice';
 
 export const EmergencyPage: React.FC = () => {
-  const { t } = useLanguage();
+  const t = useSelector(selectTranslation);
   const [sosActivated, setSosActivated] = useState(false);
 
   const handleSOS = () => {
@@ -84,11 +85,10 @@ export const EmergencyPage: React.FC = () => {
             onClick={handleSOS}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`w-48 h-48 mx-auto rounded-full font-bold text-2xl text-white shadow-2xl transition-all duration-300 ${
-              sosActivated
+            className={`w-48 h-48 mx-auto rounded-full font-bold text-2xl text-white shadow-2xl transition-all duration-300 ${sosActivated
                 ? 'bg-red-700 animate-pulse'
                 : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
-            }`}
+              }`}
           >
             {sosActivated ? (
               <div className="flex flex-col items-center justify-center h-full">
@@ -103,7 +103,7 @@ export const EmergencyPage: React.FC = () => {
               </div>
             )}
           </motion.button>
-          
+
           {sosActivated && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -128,7 +128,7 @@ export const EmergencyPage: React.FC = () => {
               <Phone className="w-6 h-6 mr-3 text-red-600" />
               {t('emergency.contacts.title')}
             </h2>
-            
+
             <div className="space-y-4">
               {emergencyContacts.map((contact, index) => (
                 <motion.div
@@ -136,18 +136,16 @@ export const EmergencyPage: React.FC = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
-                  className={`flex items-center justify-between p-4 rounded-lg border ${
-                    contact.urgent
+                  className={`flex items-center justify-between p-4 rounded-lg border ${contact.urgent
                       ? 'border-red-200 bg-red-50'
                       : 'border-gray-200 bg-gray-50'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center space-x-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      contact.urgent
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${contact.urgent
                         ? 'bg-red-600 text-white'
                         : 'bg-blue-600 text-white'
-                    }`}>
+                      }`}>
                       <contact.icon className="w-5 h-5" />
                     </div>
                     <div>
@@ -156,11 +154,10 @@ export const EmergencyPage: React.FC = () => {
                     </div>
                   </div>
                   <button
-                    className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                      contact.urgent
+                    className={`px-4 py-2 rounded-lg font-semibold transition-colors ${contact.urgent
                         ? 'bg-red-600 text-white hover:bg-red-700'
                         : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
+                      }`}
                   >
                     {t('emergency.contacts.callNow')}
                   </button>
@@ -180,7 +177,7 @@ export const EmergencyPage: React.FC = () => {
               <MapPin className="w-6 h-6 mr-3 text-blue-600" />
               {t('emergency.facilities.title')}
             </h2>
-            
+
             <div className="space-y-4">
               {nearbyFacilities.map((facility, index) => (
                 <motion.div
@@ -198,15 +195,14 @@ export const EmergencyPage: React.FC = () => {
                     <div className="text-right">
                       <div className="flex items-center text-yellow-500 mb-1">
                         {[...Array(5)].map((_, i) => (
-                          <span key={i} className={`text-xs ${
-                            i < Math.floor(facility.rating) ? 'text-yellow-400' : 'text-gray-300'
-                          }`}>★</span>
+                          <span key={i} className={`text-xs ${i < Math.floor(facility.rating) ? 'text-yellow-400' : 'text-gray-300'
+                            }`}>★</span>
                         ))}
                         <span className="text-gray-600 text-xs ml-1">{facility.rating}</span>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
                     <div className="flex items-center space-x-1">
                       <Navigation className="w-4 h-4" />
@@ -217,7 +213,7 @@ export const EmergencyPage: React.FC = () => {
                       <span>{facility.waitTime}</span>
                     </div>
                   </div>
-                  
+
                   <div className="flex space-x-2">
                     <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm">
                       {t('emergency.facilities.getDirections')}

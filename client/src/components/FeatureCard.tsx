@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useLanguage } from '../context/LanguageContext';
+import { useSelector } from 'react-redux';
+import { selectTranslation } from '../store/slices/languageSlice';
 
 interface FeatureCardProps {
   icon: any;
@@ -10,14 +11,14 @@ interface FeatureCardProps {
   delay?: number;
 }
 
-export const FeatureCard: React.FC<FeatureCardProps> = ({ 
-  icon: Icon, 
-  title, 
-  description, 
+export const FeatureCard: React.FC<FeatureCardProps> = ({
+  icon: Icon,
+  title,
+  description,
   gradient,
-  delay = 0 
+  delay = 0
 }) => {
-  const { t } = useLanguage();
+  const t = useSelector(selectTranslation);
 
   return (
     <motion.div

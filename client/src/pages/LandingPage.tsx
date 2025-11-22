@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Calendar, 
-  FileText, 
-  Bot, 
+import {
+  Calendar,
+  FileText,
+  Bot,
   AlertTriangle,
   Smartphone,
   Shield,
@@ -14,11 +14,12 @@ import {
   Star,
   Play
 } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { useSelector } from 'react-redux';
+import { selectTranslation } from '../store/slices/languageSlice';
 import { FeatureCard } from '../components/FeatureCard';
 import logo from "../assets/Logo.png"
 export const LandingPage: React.FC = () => {
-  const { t } = useLanguage();
+  const t = useSelector(selectTranslation);
 
   const features = [
     {
@@ -84,7 +85,7 @@ export const LandingPage: React.FC = () => {
             >
               {t('hero.tagline')}
             </motion.h1>
-            
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -107,7 +108,7 @@ export const LandingPage: React.FC = () => {
                 <span>{t('nav.signup')}</span>
                 <ArrowRight className="w-5 h-5" />
               </Link>
-              
+
               <Link
                 to="/login"
                 className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300 flex items-center justify-center space-x-2"
@@ -271,12 +272,12 @@ export const LandingPage: React.FC = () => {
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center">
                   <div className="w-20 h-20 rounded-lg flex items-center justify-center">
-              <img
-                src={logo}
-                alt="MediMitra"
-                className="max-h-full max-w-full object-contain"
-              />
-            </div>
+                    <img
+                      src={logo}
+                      alt="MediMitra"
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
                 </div>
                 <span className="text-xl font-bold">{t('footer.brand') || 'MediMitra'}</span>
               </div>

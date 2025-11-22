@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Lock, Eye, EyeOff } from "lucide-react";
-import { useLanguage } from "../context/LanguageContext";
+import { useSelector } from 'react-redux';
+import { selectTranslation } from '../store/slices/languageSlice';
 import logo from "../assets/Logo.png";
 
 export const PasswordResetPage: React.FC = () => {
@@ -15,21 +16,21 @@ export const PasswordResetPage: React.FC = () => {
   const queryParams = new URLSearchParams(location.search);
   const email = queryParams.get('email');
   const token = queryParams.get('token');
-  const { t } = useLanguage();
+  const t = useSelector(selectTranslation);
 
-  const handleSubmit = async(e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
       alert("Password is not matching with confirm password");
       return;
     }
     // Backend request to reset password here
-    const response = await fetch('/api/auth/password-reset',{
-      method:"POST",
-      headers: {'content-type':'application/json'},
-      body: JSON.stringify({password:newPassword, confirmPassword:confirmPassword, token:token, email:email}),
+    const response = await fetch('/api/auth/password-reset', {
+      method: "POST",
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ password: newPassword, confirmPassword: confirmPassword, token: token, email: email }),
     });
-    if(!response.ok){
+    if (!response.ok) {
       alert("Error in reseting your password");
       return
     };

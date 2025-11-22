@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Pill, 
-  Plus, 
-  Upload, 
-  Download, 
-  Clock, 
+import {
+  Pill,
+  Plus,
+  Upload,
+  Download,
+  Clock,
   Calendar,
   AlertTriangle,
   CheckCircle,
@@ -17,7 +17,6 @@ import {
   Trash2,
   Bell
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 
 interface Medicine {
   id: string;
@@ -45,13 +44,12 @@ interface MedicineSchedule {
 }
 
 export const MyMedicinesPage: React.FC = () => {
-  const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [activeTab, setActiveTab] = useState<'current' | 'schedule' | 'history'>('current');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState<Medicine | null>(null);
-  
+
   const [medicines, setMedicines] = useState<Medicine[]>([
     {
       id: '1',
@@ -150,7 +148,7 @@ export const MyMedicinesPage: React.FC = () => {
   const getRefillAlerts = () => {
     const today = new Date();
     const fiveDaysFromNow = new Date(today.getTime() + 5 * 24 * 60 * 60 * 1000);
-    
+
     return medicines.filter(medicine => {
       const endDate = new Date(medicine.endDate);
       return endDate <= fiveDaysFromNow && medicine.status === 'active';
@@ -164,7 +162,7 @@ export const MyMedicinesPage: React.FC = () => {
       status: 'active',
       taken: {}
     };
-    
+
     setMedicines(prev => [...prev, medicine]);
     setNewMedicine({
       name: '',
@@ -180,25 +178,25 @@ export const MyMedicinesPage: React.FC = () => {
   };
 
   const handleUpdateSideEffects = (medicineId: string, sideEffects: string) => {
-    setMedicines(prev => prev.map(med => 
+    setMedicines(prev => prev.map(med =>
       med.id === medicineId ? { ...med, sideEffects } : med
     ));
   };
 
   const handleMarkAsTaken = (scheduleTime: string, medicineId: string) => {
     const today = new Date().toISOString().split('T')[0];
-    setMedicines(prev => prev.map(med => 
-      med.id === medicineId 
+    setMedicines(prev => prev.map(med =>
+      med.id === medicineId
         ? { ...med, taken: { ...med.taken, [today]: !med.taken[today] } }
         : med
     ));
   };
 
   const downloadMedicineList = () => {
-    const content = medicines.map(med => 
+    const content = medicines.map(med =>
       `Medicine: ${med.name}\nDosage: ${med.dosage}\nFrequency: ${med.frequency}\nDoctor: ${med.prescribingDoctor}\nStart: ${med.startDate}\nEnd: ${med.endDate}\nNotes: ${med.notes || 'None'}\n\n`
     ).join('');
-    
+
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -276,7 +274,7 @@ export const MyMedicinesPage: React.FC = () => {
             <Plus className="w-5 h-5" />
             <span>Add Medicine</span>
           </button>
-          
+
           <button
             onClick={() => fileInputRef.current?.click()}
             className="flex items-center space-x-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
@@ -284,7 +282,7 @@ export const MyMedicinesPage: React.FC = () => {
             <Upload className="w-5 h-5" />
             <span>Upload Prescription</span>
           </button>
-          
+
           <button
             onClick={downloadMedicineList}
             className="flex items-center space-x-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
@@ -292,7 +290,7 @@ export const MyMedicinesPage: React.FC = () => {
             <Download className="w-5 h-5" />
             <span>Download List</span>
           </button>
-          
+
           <input
             ref={fileInputRef}
             type="file"
@@ -313,11 +311,10 @@ export const MyMedicinesPage: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-medium transition-colors ${
-                  activeTab === tab.id
+                className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-medium transition-colors ${activeTab === tab.id
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 <tab.icon className="w-5 h-5" />
                 <span>{tab.label}</span>

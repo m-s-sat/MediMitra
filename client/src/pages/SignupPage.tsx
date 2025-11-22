@@ -2,11 +2,16 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, User, Phone, Globe, Building2, Stethoscope } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useLanguage } from '../context/LanguageContext';
+import { useSelector } from 'react-redux';
+import { useSignupMutation } from '../store/api/authApi';
+import { selectTranslation, selectAvailableLanguages } from '../store/slices/languageSlice';
 
 export const SignupPage: React.FC = () => {
-  const { t } = useLanguage();
+  const t = useSelector(selectTranslation);
+  const availableLanguages = useSelector(selectAvailableLanguages);
+  const [signup, { isLoading }] = useSignupMutation();
+  const navigate = useNavigate();
+
   const [selectedRole, setSelectedRole] = useState<'patient' | 'hospital' | 'doctor'>('patient');
   const [showComingSoonModal, setShowComingSoonModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -23,11 +28,6 @@ export const SignupPage: React.FC = () => {
   };
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const { signup } = useAuth();
-  const { availableLanguages } = useLanguage();
-  const navigate = useNavigate();
 
   const handleRoleSelection = (role: 'patient' | 'hospital' | 'doctor') => {
     if (role === 'doctor') {
@@ -52,10 +52,7 @@ export const SignupPage: React.FC = () => {
       return;
     }
 
-    setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
+    try {
       const newUser = {
         name: formData.name,
         email: formData.email,
@@ -65,12 +62,16 @@ export const SignupPage: React.FC = () => {
         avatar: '',
         role: selectedRole
       };
-      signup(newUser);
-      if(selectedRole === 'patient') return navigate('/dashboard');
-      else if(selectedRole === 'hospital') return navigate('/hospital/dashboard');
+
+      await signup(newUser).unwrap();
+
+      if (selectedRole === 'patient') return navigate('/dashboard');
+      else if (selectedRole === 'hospital') return navigate('/hospital/dashboard');
       // else navigate('/doctor/dashboard');
-      setIsLoading(false);
-    }, 1500);
+    } catch (error) {
+      console.error("Signup failed:", error);
+      alert("Signup failed. Please try again.");
+    }
   };
 
   const handleInputChange = (field: string, value: string | boolean) => {
@@ -104,14 +105,14 @@ export const SignupPage: React.FC = () => {
                 type="button"
                 onClick={() => handleRoleSelection('patient')}
                 className={`p-4 rounded-xl border-2 transition-all duration-200 ${selectedRole === 'patient'
-                    ? 'border-blue-600 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-blue-600 bg-blue-50'
+                  : 'border-gray-200 hover:border-gray-300'
                   }`}
               >
                 <div className="flex flex-col items-center space-y-2">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center ${selectedRole === 'patient'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-600'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-600'
                     }`}>
                     <User className="w-6 h-6" />
                   </div>
@@ -366,55 +367,55 @@ export const SignupPage: React.FC = () => {
             </div>
 
 
+          </div>
+
+          <p className="mt-8 text-center text-sm text-gray-600">
+            Already have an account?{' '}
+            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-700">
+              Sign in
+            </Link>
+          </p>
         </div>
 
-        <p className="mt-8 text-center text-sm text-gray-600">
-          Already have an account?{' '}
-          <Link to="/login" className="font-medium text-blue-600 hover:text-blue-700">
-            Sign in
-          </Link>
-        </p>
-    </div>
-
-        {/* Coming Soon Modal */ }
-  {
-    showComingSoonModal && (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-        onClick={() => setShowComingSoonModal(false)}
-      >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Stethoscope className="w-8 h-8 text-white" />
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">Doctor Registration</h3>
-          <p className="text-gray-600 mb-6">
-            Doctor registration is coming soon! We're working on verification processes and credential validation.
-          </p>
-          <div className="flex items-center justify-center space-x-2 text-orange-600 mb-4">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100">
-              Coming Soon
-            </span>
-          </div>
-          <button
-            onClick={() => setShowComingSoonModal(false)}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-          >
-            Got it
-          </button>
-        </motion.div>
-      </motion.div>
-    )
-  }
+        {/* Coming Soon Modal */}
+        {
+          showComingSoonModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+              onClick={() => setShowComingSoonModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Stethoscope className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Doctor Registration</h3>
+                <p className="text-gray-600 mb-6">
+                  Doctor registration is coming soon! We're working on verification processes and credential validation.
+                </p>
+                <div className="flex items-center justify-center space-x-2 text-orange-600 mb-4">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100">
+                    Coming Soon
+                  </span>
+                </div>
+                <button
+                  onClick={() => setShowComingSoonModal(false)}
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                >
+                  Got it
+                </button>
+              </motion.div>
+            </motion.div>
+          )
+        }
       </motion.div >
     </div >
   );
