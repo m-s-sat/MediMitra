@@ -3,13 +3,11 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Calendar,
-  Clock,
   Video,
   MapPin,
   Search,
   Filter,
   Star,
-  Plus,
   CheckCircle,
   MessageSquare
 } from 'lucide-react';

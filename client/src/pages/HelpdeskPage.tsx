@@ -9,16 +9,12 @@ import {
   Phone,
   MessageCircle,
   FileText,
-  Clock,
-  CheckCircle,
-  AlertTriangle,
   ChevronDown,
   ChevronUp,
   User,
   Bot,
   Paperclip
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 
 interface Ticket {
   id: string;
@@ -47,7 +43,6 @@ interface FAQ {
 }
 
 export const HelpdeskPage: React.FC = () => {
-  const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatFileInputRef = useRef<HTMLInputElement>(null);
   
